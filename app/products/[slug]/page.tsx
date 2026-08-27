@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { CheckCircle2, ChevronRight, Headphones, ShieldCheck, ShoppingCart, Truck, Wrench } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Headphones, ShieldCheck, Truck, Wrench } from 'lucide-react';
 import { ProductVisual } from '@/components/ProductVisual';
 import { ProductCard } from '@/components/ProductCard';
+import { AddToCartButton } from '@/components/AddToCartButton';
 import { products } from '@/data/catalog';
 
 export function generateStaticParams(){return products.map(p=>({slug:p.slug}));}
@@ -29,7 +30,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
 
         <div className="mt-7 grid gap-3 sm:grid-cols-2">{product.specs.map(x=><div key={x} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold"><CheckCircle2 size={17} className="text-[#0b5cff]"/>{x}</div>)}</div>
 
-        <div className="mt-8 flex flex-wrap gap-3">{!quoteOnly && <Link href="/cart" className="rounded-full bg-[#f47b20] px-6 py-3.5 font-black text-white shadow-sm transition hover:-translate-y-0.5"><ShoppingCart className="mr-2 inline" size={17}/>Add to Cart</Link>}<Link href="/quote" className="rounded-full bg-[#061321] px-6 py-3.5 font-black text-white">Request Business Quote</Link></div>
+        <div className="mt-8 flex flex-wrap gap-3">{!quoteOnly && <AddToCartButton product={product}/>}<Link href="/quote" className="rounded-full bg-[#061321] px-6 py-3.5 font-black text-white">Request Business Quote</Link></div>
 
         <div className="mt-8 grid grid-cols-2 gap-3 text-xs font-bold text-slate-600 sm:grid-cols-4">
           <div className="rounded-xl bg-slate-100 p-3"><Truck size={17} className="mb-2 text-[#0b5cff]"/>Kuwait delivery</div>
