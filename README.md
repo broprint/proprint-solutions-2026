@@ -17,6 +17,16 @@ Management-ready Next.js prototype for the ProPrint Solutions 2026 digital platf
 
 The current V6 work is maintained on the `v6-ecommerce` branch and reviewed through Pull Request #1 before merging into `main`.
 
+For local branch testing:
+
+```bash
+git fetch origin
+git checkout v6-ecommerce
+git pull origin v6-ecommerce
+npm install
+npm run dev
+```
+
 The production roadmap keeps the corporate website and service workflows under ProPrint while allowing the future store to connect to Shopify at `shop.proprintsolutions.net`.
 
 ## Notes
