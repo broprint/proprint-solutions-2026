@@ -1,24 +1,34 @@
-# ProPrint Solutions 2026 — V5 Management Prototype
+# ProPrint Solutions 2026 Prototype
 
-A local Next.js/Tailwind proof of concept for the ProPrint 2026 corporate + commerce redesign.
+Management-ready Next.js prototype for the ProPrint Solutions 2026 digital platform.
 
-## Run locally
+## Main prototype routes
+
+- `/` — Corporate homepage
+- `/shop` — E-commerce catalog prototype
+- `/products/[slug]` — Product detail pages
+- `/cart` — Prototype cart / future Shopify checkout handoff
+- `/service` — ProPrint Service Center
+- `/amc` — Annual Maintenance Contracts
+- `/enterprise` — Enterprise IT & Field Services
+- `/quote` — Business, AMC and enterprise quotation workflow
+
+## Development workflow
+
+The current V6 work is maintained on the `v6-ecommerce` branch and reviewed through Pull Request #1 before merging into `main`.
+
+For local branch testing:
 
 ```bash
+git fetch origin
+git checkout v6-ecommerce
+git pull origin v6-ecommerce
 npm install
 npm run dev
 ```
 
-Open http://localhost:3000
+The production roadmap keeps the corporate website and service workflows under ProPrint while allowing the future store to connect to Shopify at `shop.proprintsolutions.net`.
 
-## Included routes
+## Notes
 
-- `/` — corporate homepage
-- `/shop` — shop homepage / product listing
-- `/products/[slug]` — product detail examples
-- `/cart` — prototype cart
-- `/service` — service-center request page
-- `/quote` — business / AMC / enterprise quotation page
-
-The project uses the supplied ProPrint Solutions logo in `public/proprint-logo.png`.
-Product prices and catalog data are demo values only for management presentation purposes.
+Product pricing and catalog data in this prototype are demonstration values only. Client/service-partner names should only be displayed publicly where branding permission is confirmed.

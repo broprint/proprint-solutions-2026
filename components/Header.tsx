@@ -4,7 +4,7 @@ import { Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { useState } from 'react';
 
 const nav = [
-  ['Products','/#products'],['Solutions','/#solutions'],['Services','/#services'],['Enterprise IT','/#enterprise'],['Brands','/#brands'],['About','/#about']
+  ['Products','/#products'],['Solutions','/#solutions'],['Services','/service'],['AMC','/amc'],['Enterprise IT','/enterprise'],['Brands','/#brands'],['About','/#about']
 ];
 
 export function Header(){
@@ -14,7 +14,7 @@ export function Header(){
   <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
    <div className="container flex min-h-[76px] items-center gap-5">
     <Link href="/" className="shrink-0" aria-label="ProPrint Solutions home"><img src="/proprint-logo.png" alt="ProPrint Solutions" className="h-auto w-[188px] object-contain"/></Link>
-    <nav className="hidden flex-1 items-center justify-center gap-6 text-[13px] font-bold text-slate-700 lg:flex">{nav.map(([label,href])=><Link key={label} href={href} className="transition hover:text-[#0b5cff]">{label}</Link>)}</nav>
+    <nav className="hidden flex-1 items-center justify-center gap-5 text-[13px] font-bold text-slate-700 lg:flex">{nav.map(([label,href])=><Link key={label} href={href} className="transition hover:text-[#0b5cff]">{label}</Link>)}</nav>
     <div className="ml-auto flex items-center gap-2">
       <div className="hidden h-11 w-60 items-center rounded-full border border-slate-200 bg-slate-50 px-4 xl:flex"><Search size={17} className="text-slate-400"/><input aria-label="Search products" className="w-full bg-transparent px-2 text-sm outline-none" placeholder="Search products..."/></div>
       <Link href="/shop" className="hidden rounded-full bg-[#f47b20] px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 sm:inline-flex">Shop Online</Link>
@@ -22,8 +22,8 @@ export function Header(){
       <button aria-label="Open menu" onClick={()=>setOpen(!open)} className="rounded-xl border border-slate-200 p-2.5 lg:hidden">{open?<X size={21}/>:<Menu size={21}/>}</button>
     </div>
    </div>
-   <div className="hidden border-t border-slate-100 lg:block"><div className="container flex h-11 items-center gap-7 text-[11px] font-black uppercase tracking-[.08em] text-slate-600"><Link href="/shop">Computers</Link><Link href="/shop">Printing</Link><Link href="/shop">Plotters</Link><Link href="/shop">Networking</Link><Link href="/shop">Servers & Storage</Link><Link href="/shop">Accessories</Link><Link href="/service">Service Center</Link><Link href="/#enterprise">Enterprise IT</Link></div></div>
-   {open&&<div className="border-t bg-white lg:hidden"><div className="container grid gap-1 py-4 text-sm font-bold">{nav.map(([label,href])=><Link onClick={()=>setOpen(false)} className="rounded-xl px-3 py-3 hover:bg-slate-50" key={label} href={href}>{label}</Link>)}<Link className="mt-2 rounded-xl bg-[#f47b20] px-3 py-3 text-center text-white" href="/shop">Shop Online</Link></div></div>}
+   <div className="hidden border-t border-slate-100 lg:block"><div className="container flex h-11 items-center gap-7 text-[11px] font-black uppercase tracking-[.08em] text-slate-600"><Link href="/shop">Computers</Link><Link href="/shop">Printing</Link><Link href="/shop">Plotters</Link><Link href="/shop">Networking</Link><Link href="/shop">Servers & Storage</Link><Link href="/shop">Accessories</Link><Link href="/service">Service Center</Link><Link href="/amc">AMC</Link><Link href="/enterprise">Enterprise IT</Link></div></div>
+   {open&&<div className="border-t bg-white lg:hidden"><div className="container grid gap-1 py-4 text-sm font-bold">{nav.map(([label,href])=><Link onClick={()=>setOpen(false)} className="rounded-xl px-3 py-3 hover:bg-slate-50" key={label} href={href}>{label}</Link>)}<Link onClick={()=>setOpen(false)} className="mt-2 rounded-xl bg-[#f47b20] px-3 py-3 text-center text-white" href="/shop">Shop Online</Link></div></div>}
   </header>
  </>;
 }
