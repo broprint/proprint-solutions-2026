@@ -8,6 +8,16 @@ import { categories, products } from '@/data/catalog';
 const categoryIcons:any={laptop:Laptop,printer:Printer,plotter:Ruler,network:Network,storage:Server,monitor:Monitor};
 const services=['Printer & Plotter Repair','Laptop & PC Support','Installation & Configuration','Warranty & Parts Support','Preventive Maintenance','Corporate AMC'];
 const enterprise=['Onsite IT Support','Field Engineering','IMAC Services','Hardware Break / Fix','Device Deployment','Asset & Lifecycle Support'];
+const brandLogos=[
+  {name:'HP',slug:'hp',className:'h-16 w-16'},
+  {name:'Lenovo',slug:'lenovo',className:'h-9 w-32'},
+  {name:'Dell',slug:'dell',className:'h-14 w-24'},
+  {name:'Canon',slug:'canon',className:'h-10 w-32'},
+  {name:'Epson',slug:'epson',className:'h-9 w-32'},
+  {name:'Brother',slug:'brother',className:'h-10 w-32'},
+  {name:'ASUS',slug:'asus',className:'h-9 w-32'},
+  {name:'MSI',slug:'msi',className:'h-10 w-32'},
+];
 
 export default function Home(){return <div id="top">
  <section className="relative overflow-hidden bg-[#061321] text-white">
@@ -42,7 +52,7 @@ export default function Home(){return <div id="top">
 
  <section id="enterprise" className="py-20"><div className="container grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-center"><div><div className="text-[11px] font-black uppercase tracking-[.2em] text-[#0b5cff]">Enterprise IT & Field Services</div><h2 className="mt-3 text-4xl font-black tracking-[-.03em] md:text-5xl">Onsite capability for enterprise environments.</h2><p className="mt-5 max-w-xl leading-7 text-slate-600">Professional onsite IT support, field engineering, hardware services and deployment capability for managed enterprise environments across Kuwait.</p><p className="mt-4 text-sm font-bold text-slate-500">Current enterprise contract experience is represented as capability; client names are displayed only where public branding permission is confirmed.</p><Link href="/quote" className="mt-7 inline-flex rounded-full bg-[#0b5cff] px-6 py-3.5 font-black text-white">Talk to Enterprise Team <ArrowRight className="ml-2"/></Link></div><div className="grid gap-4 sm:grid-cols-2">{enterprise.map(x=><div key={x} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><Building2 className="text-[#0b5cff]" size={24}/><h3 className="mt-4 font-black">{x}</h3><p className="mt-1 text-sm text-slate-500">Enterprise-ready field capability.</p></div>)}</div></div></section>
 
- <section id="brands" className="border-y bg-slate-50 py-14"><div className="container"><SectionTitle eyebrow="Technology Partners" title="Brands we work with"/><div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-8">{['HP','Lenovo','Dell','Canon','Epson','Brother','ASUS','MSI'].map(b=><div key={b} className="flex h-20 items-center justify-center rounded-2xl border border-slate-200 bg-white text-lg font-black text-slate-500 shadow-sm">{b}</div>)}</div></div></section>
+ <section id="brands" className="border-y bg-slate-50 py-16"><div className="container"><div className="text-center"><div className="text-[11px] font-black uppercase tracking-[.2em] text-[#0b5cff]">Technology Partners</div><h2 className="mt-3 text-4xl font-black tracking-[-.03em]">Brands We Work With</h2><p className="mt-3 text-slate-500">Trusted global brands. Genuine products. Reliable support.</p></div><div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-8">{brandLogos.map((brand)=><div key={brand.name} className="flex h-32 items-center justify-center rounded-[1.4rem] border border-slate-200 bg-white px-5 shadow-sm transition hover:-translate-y-1 hover:shadow-md"><img src={`https://cdn.simpleicons.org/${brand.slug}`} alt={`${brand.name} logo`} className={`${brand.className} max-h-16 max-w-full object-contain`} loading="lazy"/></div>)}</div></div></section>
 
  <section id="about" className="py-20"><div className="container rounded-[2rem] bg-[#0b5cff] p-9 text-white md:p-12"><div className="grid gap-8 md:grid-cols-[1fr_auto] md:items-center"><div><div className="text-[11px] font-black uppercase tracking-[.2em] text-blue-100">Built for Kuwait business</div><h2 className="mt-3 max-w-3xl text-4xl font-black tracking-[-.03em] md:text-5xl">From one device to a complete technology deployment.</h2><p className="mt-4 max-w-2xl text-blue-100">Talk to ProPrint for retail products, corporate procurement, service, AMC or enterprise field support.</p></div><div className="flex flex-wrap gap-3"><Link href="/quote" className="rounded-full bg-white px-6 py-3.5 font-black text-[#0b5cff]">Request a Quote</Link><Link href="/shop" className="rounded-full bg-[#f47b20] px-6 py-3.5 font-black">Shop Online</Link></div></div></div></section>
  </div>}
