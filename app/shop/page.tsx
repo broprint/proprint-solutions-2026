@@ -1,0 +1,11 @@
+import Link from 'next/link';
+import { Search, SlidersHorizontal } from 'lucide-react';
+import { ProductCard } from '@/components/ProductCard';
+import { categories, products } from '@/data/catalog';
+
+export default function ShopPage(){return <main>
+ <section className="bg-[#061321] py-14 text-white"><div className="container"><div className="text-[11px] font-black uppercase tracking-[.2em] text-blue-200">ProPrint Shop</div><h1 className="mt-3 text-5xl font-black tracking-[-.04em]">Everything IT. One Store.</h1><p className="mt-4 max-w-2xl text-slate-300">Browse laptops, printers, plotters, networking, storage and accessories. Prices shown are prototype values for the management demo.</p><div className="mt-7 flex max-w-2xl items-center rounded-2xl bg-white p-2 text-slate-900"><Search className="ml-3 text-slate-400" size={19}/><input className="w-full px-3 py-2 outline-none" placeholder="Search products, brands, models or SKUs..."/></div></div></section>
+ <section className="border-b bg-white"><div className="container flex gap-3 overflow-x-auto py-4">{categories.map(([name])=><button key={name} className="whitespace-nowrap rounded-full border border-slate-200 px-4 py-2 text-xs font-black">{name}</button>)}</div></section>
+ <section className="py-16"><div className="container"><div className="flex items-center justify-between"><div><h2 className="text-3xl font-black">Featured products</h2><p className="mt-2 text-sm text-slate-500">Prototype catalog</p></div><button className="flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-bold"><SlidersHorizontal size={16}/> Filters</button></div><div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{products.map(p=><ProductCard key={p.slug} product={p}/>)}</div></div></section>
+ <section className="pb-20"><div className="container rounded-[2rem] bg-slate-100 p-8 md:flex md:items-center md:justify-between"><div><h2 className="text-2xl font-black">Buying for your business?</h2><p className="mt-2 text-slate-600">Request corporate pricing for bulk orders, installation, deployment or AMC.</p></div><Link href="/quote" className="mt-5 inline-flex rounded-full bg-[#f47b20] px-6 py-3 font-black text-white md:mt-0">Request Business Quote</Link></div></section>
+ </main>}

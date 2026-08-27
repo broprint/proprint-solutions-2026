@@ -1,0 +1,9 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { CheckCircle2, ShoppingCart } from 'lucide-react';
+import { ProductVisual } from '@/components/ProductVisual';
+import { products } from '@/data/catalog';
+
+export function generateStaticParams(){return products.map(p=>({slug:p.slug}));}
+
+export default async function ProductPage({params}:{params:Promise<{slug:string}>}){const {slug}=await params; const product=products.find(p=>p.slug===slug); if(!product)notFound();return <main className="py-14"><div className="container"><div className="text-sm text-slate-500"><Link href="/shop">Shop</Link> / {product.category} / {product.name}</div><div className="mt-8 grid gap-12 lg:grid-cols-2"><div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white"><ProductVisual icon={product.icon}/></div><div><div className="text-[11px] font-black uppercase tracking-[.16em] text-[#0b5cff]">{product.brand} • {product.category}</div><h1 className="mt-3 text-4xl font-black tracking-[-.03em]">{product.name}</h1><div className="mt-5 text-3xl font-black">{product.price}</div><div className="mt-7 space-y-3">{product.specs.map(x=><div key={x} className="flex items-center gap-2 text-sm"><CheckCircle2 size={17} className="text-[#0b5cff]"/>{x}</div>)}</div><div className="mt-8 flex flex-wrap gap-3"><Link href="/cart" className="rounded-full bg-[#f47b20] px-6 py-3.5 font-black text-white"><ShoppingCart className="mr-2 inline" size={17}/>Add to Cart</Link><Link href="/quote" className="rounded-full bg-[#061321] px-6 py-3.5 font-black text-white">Request Quote</Link></div><div className="mt-9 rounded-2xl bg-blue-50 p-5"><b>ProPrint Support</b><p className="mt-2 text-sm leading-6 text-slate-600">Installation, configuration, onsite support and AMC options can be included with eligible business purchases.</p></div></div></div></div></main>}
