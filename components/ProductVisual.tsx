@@ -1,10 +1,21 @@
+import Image from 'next/image';
 import { HardDrive, Laptop, Monitor, Network, Printer, Ruler } from 'lucide-react';
 
 const map = { laptop:Laptop, printer:Printer, plotter:Ruler, monitor:Monitor, network:Network, storage:HardDrive } as const;
 const labels = { laptop:'Business Computing', printer:'Office Printing', plotter:'Large Format', monitor:'Displays', network:'Networking', storage:'Storage' } as const;
 
-export function ProductVisual({ icon, compact=false }: { icon:keyof typeof map; compact?:boolean }) {
+export function ProductVisual({ icon, compact=false, image, imageAlt='' }: { icon:keyof typeof map; compact?:boolean; image?:string; imageAlt?:string }) {
   const Icon = map[icon];
+
+  if (image) {
+    return <div className={`relative overflow-hidden bg-white ${compact ? 'h-44' : 'h-60'}`}>
+      <div className="absolute left-4 top-4 z-20 rounded-full border border-blue-100 bg-white/95 px-3 py-1 text-[9px] font-black uppercase tracking-[.12em] text-[#0b5cff] shadow-sm">{labels[icon]}</div>
+      <div className="relative h-full w-full p-7">
+        <Image src={image} alt={imageAlt} fill sizes={compact ? '(max-width: 768px) 50vw, 320px' : '(max-width: 768px) 100vw, 600px'} className="object-contain p-7" />
+      </div>
+    </div>;
+  }
+
   return <div className={`product-visual relative overflow-hidden ${compact ? 'h-44' : 'h-60'}`}>
     <div className="product-glow" />
     <div className="absolute inset-x-6 bottom-5 h-8 rounded-[50%] bg-slate-900/10 blur-md" />
