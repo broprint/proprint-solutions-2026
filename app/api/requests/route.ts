@@ -47,7 +47,10 @@ export async function POST(request: Request) {
 
     const webhook = process.env.PROPRINT_REQUEST_WEBHOOK_URL;
     const resendKey = process.env.RESEND_API_KEY;
-    const requestEmail = process.env.PROPRINT_REQUEST_EMAIL;
+    const requestEmails = (process.env.PROPRINT_REQUEST_EMAIL || '')
+      .split(',')
+      .map((address) => address.trim())
+      .filter((address) => /^\S+@\S+\.\S+$/.test(address));
     const fromEmail = process.env.PROPRINT_FROM_EMAIL || 'ProPrint Website <onboarding@resend.dev>';
 
     if (webhook) {
@@ -60,7 +63,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, reference: ref, delivery: 'webhook' });
     }
 
-    if (resendKey && requestEmail) {
+    if (resendKey && requestEmails.length) {
       const title = type === 'service' ? 'Service Request' : 'Quote Request';
       const rows = [
         ['Reference', ref], ['Submitted', submittedAt], ['Name', name], ['Company', company], ['Phone', phone], ['Email', email],
@@ -70,7 +73,7 @@ export async function POST(request: Request) {
       const emailResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ from: fromEmail, to: [requestEmail], subject: `${title} ${ref} — ${name}`, html, reply_to: email || undefined }),
+        body: JSON.stringify({ from: fromEmail, to: requestEmails, subject: `${title} ${ref} — ${name}`, html, reply_to: email || undefined }),
       });
       if (!emailResponse.ok) throw new Error('Email delivery failed');
       return NextResponse.json({ ok: true, reference: ref, delivery: 'email' });
