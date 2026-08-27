@@ -12,21 +12,29 @@ export function RequestForm({ mode }: Props) {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus('sending');
     setMessage('');
-    const form = new FormData(event.currentTarget);
+    setReference('');
+
+    const form = new FormData(formElement);
     const body = Object.fromEntries(form.entries());
 
     try {
       const response = await fetch('/api/requests', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...body, type: mode })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...body, type: mode })
       });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Submission failed');
+
       setReference(result.reference || '');
-      setMessage(result.delivery === 'demo' ? 'Request captured in demo mode. Live email/webhook delivery still needs to be configured.' : 'Your request has been submitted successfully.');
+      setMessage(result.delivery === 'demo'
+        ? 'Request captured in demo mode. Live email/webhook delivery still needs to be configured.'
+        : 'Your request has been submitted successfully.');
       setStatus('success');
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to submit your request.');
       setStatus('error');
