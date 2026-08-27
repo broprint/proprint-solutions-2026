@@ -9,14 +9,14 @@ const categoryIcons:any={laptop:Laptop,printer:Printer,plotter:Ruler,network:Net
 const services=['Printer & Plotter Repair','Laptop & PC Support','Installation & Configuration','Warranty & Parts Support','Preventive Maintenance','Corporate AMC'];
 const enterprise=['Onsite IT Support','Field Engineering','IMAC Services','Hardware Break / Fix','Device Deployment','Asset & Lifecycle Support'];
 const brandLogos=[
-  {name:'HP',src:'https://cdn.simpleicons.org/hp/0096D6',className:'h-16 w-16'},
-  {name:'Lenovo',src:'https://cdn.simpleicons.org/lenovo/E2231A',className:'h-9 w-32'},
-  {name:'Dell',src:'https://cdn.simpleicons.org/dell/007DB8',className:'h-14 w-24'},
-  {name:'Canon',src:'https://cdn.simpleicons.org/canon/CC0000',className:'h-10 w-32'},
-  {name:'Epson',src:'https://cdn.simpleicons.org/epson/003399',className:'h-9 w-32'},
-  {name:'Brother',src:'https://cdn.simpleicons.org/brother/005BAC',className:'h-10 w-32'},
-  {name:'ASUS',src:'https://cdn.simpleicons.org/asus/000000',className:'h-9 w-32'},
-  {name:'MSI',src:'https://cdn.simpleicons.org/msi/EA2027',className:'h-10 w-32'},
+  {name:'HP',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/HP_logo_2025.svg',className:'h-16 w-16'},
+  {name:'Lenovo',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Lenovo-Logo.svg',className:'h-9 w-32'},
+  {name:'Dell',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Dell_Logo.svg',className:'h-14 w-24'},
+  {name:'Canon',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Canon_wordmark.svg',className:'h-10 w-32'},
+  {name:'Epson',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Epson_logo.svg',className:'h-10 w-32'},
+  {name:'Brother',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Brother_logo.svg',className:'h-10 w-32'},
+  {name:'ASUS',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/ASUS_Logo.svg',className:'h-9 w-32'},
+  {name:'MSI',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/MicroStarInternational.svg',className:'h-10 w-32'},
 ];
 
 export default function Home(){return <div id="top">
