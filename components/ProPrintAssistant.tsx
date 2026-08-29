@@ -31,14 +31,66 @@ const QUICK_ACTIONS = [
   'Request a Quote',
 ];
 
-function getReply(input: string): Reply {
+function getReply(input: string, history: Message[] = []): Reply {
   const text = input.toLowerCase();
+  const recentUserContext = history
+    .filter((message) => message.role === 'user')
+    .slice(-6)
+    .map((message) => message.text.toLowerCase())
+    .join(' ');
+  const context = `${recentUserContext} ${text}`;
+
+  const repairContext = /(repair|service|fix|broken|fault|screen|lcd|display|hinge|keyboard|battery|charging|motherboard|mainboard)/.test(context);
+  const laptopContext = /(laptop|notebook|hp|lenovo|dell|asus|msi)/.test(context);
+  const screenContext = /(lcd|screen|display|panel|cracked screen|broken screen)/.test(context);
+  const priceQuestion = /(how much|price|cost|charge|charges|quotation|quote)/.test(text);
+  const etaQuestion = /(eta|how long|time|when|days|ready|finish|complete)/.test(text);
 
   if (/(outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international|overseas)/.test(text)) {
     return {
       text: 'This ProPrint website assistant is currently configured for Kuwait enquiries only. For any requirement outside Kuwait, please contact ProPrint directly before assuming delivery or service coverage.',
       href: '/contact',
       actionLabel: 'Contact ProPrint',
+    };
+  }
+
+  if (repairContext && laptopContext && screenContext && priceQuestion) {
+    return {
+      text: 'Yes. ProPrint can accept laptop LCD/display replacement requests in Kuwait, including HP laptops. The service or diagnostic charge can be advised according to ProPrint’s approved service rate, but the full repair quotation depends on the exact laptop model and the replacement LCD price from the vendor. Once the correct part and vendor availability are confirmed, ProPrint can provide the final quotation and expected completion ETA. Please provide the exact HP model or product number for an accurate check.',
+      href: '/service',
+      actionLabel: 'Submit Laptop Model',
+    };
+  }
+
+  if (repairContext && laptopContext && screenContext && etaQuestion) {
+    return {
+      text: 'For an LCD replacement, the final ETA depends mainly on identifying the exact screen part and confirming vendor stock. ProPrint can give a confirmed ETA after checking the laptop model and part availability. If the part is locally available the repair can be scheduled sooner; special-order parts will take longer. Submit the exact model so the service team can check it.',
+      href: '/service',
+      actionLabel: 'Check Repair Requirement',
+    };
+  }
+
+  if (/(do you repair|can you repair|repair hp|hp laptop repair|laptop repair|notebook repair)/.test(context)) {
+    return {
+      text: 'Yes. ProPrint can accept laptop repair requests in Kuwait, including HP laptops. Common requests can include display/LCD issues, keyboards, batteries, charging faults, hardware diagnostics and other laptop problems. The exact repair scope is confirmed after the model and fault are reviewed.',
+      href: '/service',
+      actionLabel: 'Start HP Laptop Service Request',
+    };
+  }
+
+  if (repairContext && priceQuestion) {
+    return {
+      text: 'For repairs, ProPrint can advise the applicable service or diagnostic charge, but a complete quotation may also require spare-part pricing from the vendor. The final amount is confirmed only after the exact model, fault and required part are identified. If you tell me the equipment and problem, I can guide you to the correct service request.',
+      href: '/service',
+      actionLabel: 'Request Repair Quote',
+    };
+  }
+
+  if (repairContext && etaQuestion) {
+    return {
+      text: 'Repair ETA depends on diagnosis, the exact model, the required spare part and vendor availability. ProPrint should confirm the ETA after checking those details rather than promising an inaccurate completion date. Submit the equipment model and fault so the service team can review it.',
+      href: '/service',
+      actionLabel: 'Submit Service Details',
     };
   }
 
@@ -91,7 +143,7 @@ function getReply(input: string): Reply {
   }
 
   return {
-    text: 'I can help with ProPrint products, repairs, AMC, enterprise IT and quotations in Kuwait. I will not guess live stock, final prices, repair times or service availability. Choose an option below or tell me what you need.',
+    text: 'I can help with ProPrint products, repairs, AMC, enterprise IT and quotations in Kuwait. I will not guess live stock, final prices, repair times or service availability. You can also ask follow-up questions about the same equipment or repair and I’ll keep the recent conversation in context.',
   };
 }
 
@@ -105,7 +157,7 @@ export function ProPrintAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      text: 'Hello! I’m the ProPrint Assistant. I can help with products, repairs, AMC, enterprise IT and quotations for customers in Kuwait.',
+      text: 'Hello! I’m the ProPrint Assistant. I can help with products, repairs, AMC, enterprise IT and quotations for customers in Kuwait. You can ask follow-up questions and I’ll keep the recent conversation in context.',
     },
   ]);
 
@@ -114,7 +166,7 @@ export function ProPrintAssistant() {
   function ask(text: string) {
     const clean = text.trim();
     if (!clean) return;
-    const reply = getReply(clean);
+    const reply = getReply(clean, messages);
     setMessages((current) => [
       ...current,
       { role: 'user', text: clean },
@@ -245,7 +297,7 @@ export function ProPrintAssistant() {
               <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about products or support..." aria-label="Message ProPrint Assistant" className="min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-[#0b5cff]" />
               <button type="submit" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-[#f47b20] text-white" aria-label="Send message"><Send size={17} /></button>
             </form>
-            <div className="mt-2 flex items-center justify-center gap-1 text-[10px] text-slate-400"><Headphones size={11} /> Guided website assistant • Kuwait only</div>
+            <div className="mt-2 flex items-center justify-center gap-1 text-[10px] text-slate-400"><Headphones size={11} /> Context-aware website assistant • Kuwait only</div>
           </div>
         </section>
       )}
