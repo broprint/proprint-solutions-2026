@@ -34,16 +34,17 @@ const QUICK_ACTIONS = [
 
 function getReply(input: string, history: Message[] = []): Reply {
   const text = input.toLowerCase();
-  const recentUserContext = history
+  const recentUserMessages = history
     .filter((message) => message.role === 'user')
     .slice(-8)
-    .map((message) => message.text.toLowerCase())
-    .join(' ');
+    .map((message) => message.text.toLowerCase());
+  const recentUserContext = recentUserMessages.join(' ');
   const context = `${recentUserContext} ${text}`;
 
   const priceQuestion = /(how much|price|cost|charge|charges|quotation|quote)/.test(text);
   const etaQuestion = /(eta|how long|time|when|days|ready|finish|complete)/.test(text);
   const brandOnly = /^(hp|dell|lenovo|asus|acer|msi|apple|canon|epson|brother|xerox|ricoh|kyocera)$/i.test(input.trim());
+  const knownComputerBrand = [...recentUserMessages, text].reverse().find((value) => /\b(hp|dell|lenovo|asus|acer|msi|apple)\b/.test(value))?.match(/\b(hp|dell|lenovo|asus|acer|msi|apple)\b/)?.[1];
 
   const laptopContext = /(laptop|notebook|desktop|pc|workstation|hp|dell|lenovo|asus|acer|msi|apple|macbook)/.test(context);
   const printerContext = /(printer|laserjet|officejet|deskjet|inkjet|mfp|multifunction|canon|epson|brother|xerox|ricoh|kyocera)/.test(context);
@@ -55,7 +56,7 @@ function getReply(input: string, history: Message[] = []): Reply {
   const powerContext = /(not powering|no power|dead|charging|charger|dc jack|adapter|battery)/.test(context);
   const keyboardContext = /(keyboard|keys|touchpad|trackpad)/.test(context);
   const hingeContext = /(hinge|body|casing|cover|bezel)/.test(context);
-  const overheatingContext = /(heat|heating|overheat|fan|thermal|shutdown)/.test(context);
+  const overheatingContext = /(heat|heating|overheat|fan|thermal|shutdown|very slow|slow performance)/.test(context);
 
   const paperJam = /(paper jam|jammed|paper stuck|does not feed|not feeding|feed issue|pickup)/.test(context);
   const printQuality = /(line|lines|streak|faded|fading|blur|smudge|print quality|blank page|colour issue|color issue)/.test(context);
@@ -76,7 +77,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/^(laptop|desktop|laptop repair|desktop repair|laptop \/ desktop repair)$/i.test(input.trim())) {
     return {
-      text: 'Yes. ProPrint can accept laptop and desktop repair or upgrade requests in Kuwait. Which brand and model do you have? For example HP, Dell, Lenovo, ASUS, Acer or MSI. Also tell me what is not working or what you want to upgrade.',
+      text: 'Yes, we repair laptops and desktops in Kuwait. What brand and model is your computer, and what problem are you having?',
       href: '/service',
       actionLabel: 'Open Service Request',
     };
@@ -84,30 +85,32 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (brandOnly && laptopContext && !printerContext && !plotterContext) {
     return {
-      text: `Understood — ${input.trim()} computer. Please tell me the exact model if you know it, and what is wrong or what upgrade you need. Common requests include LCD replacement, SSD or HDD replacement, HDD-to-SSD upgrade, RAM upgrade, battery, charging jack, keyboard, hinge/body repair, overheating, no power and Windows or storage problems.`,
+      text: `Sure — we handle ${input.trim().toUpperCase()} computer repairs. What is the exact model, and what issue are you having with it?`,
       href: '/service',
-      actionLabel: 'Submit Computer Details',
+      actionLabel: 'Open Service Request',
     };
   }
 
   if (laptopContext && storageContext) {
+    const brandPhrase = knownComputerBrand ? ` in your ${knownComputerBrand.toUpperCase()} computer` : '';
     if (priceQuestion) {
       return {
-        text: 'Yes, ProPrint can handle storage replacements and upgrades such as failed HDD replacement, SSD replacement, NVMe SSD upgrades and HDD-to-SSD conversion. The final price depends on the required SSD/HDD type and capacity, compatibility with the exact model, data migration requirements and current vendor price. ProPrint can confirm labour/service charges first, then provide the full quotation after the correct part is identified.',
+        text: `We can check the SSD or storage upgrade${brandPhrase}. The final price depends on the exact model, compatible drive and capacity, plus whether you need data transferred. Please give me the model and the capacity you want, such as 500GB, 1TB or 2TB.`,
         href: '/service',
         actionLabel: 'Request Storage Upgrade Quote',
       };
     }
     return {
-      text: 'Yes. We can receive requests for SSD replacement, hard-disk replacement, NVMe SSD installation and HDD-to-SSD upgrades. Please tell me the computer brand/model, current storage if known, the capacity you want such as 500GB, 1TB or 2TB, and whether you need the old data cloned or transferred.',
+      text: `Yes, we can replace or upgrade the SSD${brandPhrase}. What is the exact model, and what capacity would you like — 500GB, 1TB or 2TB? If needed, we can also check whether your existing data can be transferred to the new drive.`,
       href: '/service',
       actionLabel: 'Submit Storage Upgrade',
     };
   }
 
   if (laptopContext && ramContext) {
+    const brandPhrase = knownComputerBrand ? ` for your ${knownComputerBrand.toUpperCase()} computer` : '';
     return {
-      text: 'Yes. ProPrint can receive RAM upgrade requests. Please provide the laptop or desktop brand and exact model, current RAM if known, and the target memory you want such as 16GB or 32GB. Compatibility, available slots and maximum supported RAM must be checked before the final part quotation and ETA are confirmed.',
+      text: `Yes, we can check a RAM upgrade${brandPhrase}. What is the exact model, and how much memory would you like — for example 16GB or 32GB? We will confirm compatibility before quoting the part.`,
       href: '/service',
       actionLabel: 'Request RAM Upgrade',
     };
@@ -115,7 +118,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && screenContext && priceQuestion) {
     return {
-      text: 'Yes. ProPrint can accept laptop LCD/display replacement requests. The labour or service charge can be advised according to ProPrint’s approved rate, but the full quotation depends on the exact laptop model, screen specification and vendor part price. Once the correct LCD and stock are confirmed, ProPrint can provide the final quotation and ETA. Please provide the exact model or product number.',
+      text: 'Yes, we can check an LCD/display replacement. Please give me the exact laptop model or product number. The final price and ETA depend on the correct screen specification and current part availability.',
       href: '/service',
       actionLabel: 'Submit Laptop Model',
     };
@@ -123,7 +126,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && screenContext) {
     return {
-      text: 'Yes, we can receive laptop LCD/display repair or replacement requests. Is the screen cracked, completely blank, flickering, showing lines, very dim, or physically damaged? Please also provide the laptop brand and exact model/product number so the correct panel can be identified.',
+      text: 'Yes, we can help with the laptop display. What is the exact model, and is the screen cracked, blank, flickering, showing lines or very dim?',
       href: '/service',
       actionLabel: 'Request LCD Service',
     };
@@ -131,7 +134,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && powerContext) {
     return {
-      text: 'For a laptop or desktop power issue, please tell me whether it has no power at all, powers on but does not boot, only works on the charger, does not charge the battery, or has a loose/broken charging socket. Please include the brand and exact model so the service team can diagnose the correct area.',
+      text: 'We can check that. Does the computer have no power at all, fail to boot, work only on the charger, or fail to charge the battery? Please also give me the exact model.',
       href: '/service',
       actionLabel: 'Submit Power Fault',
     };
@@ -139,7 +142,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && keyboardContext) {
     return {
-      text: 'Yes. ProPrint can receive keyboard and touchpad repair/replacement requests. Please tell me whether individual keys have failed, the whole keyboard is not detected, liquid was spilled, the touchpad is faulty, or there is physical damage. The exact brand/model is required for part pricing and ETA.',
+      text: 'Yes, we can check the keyboard or touchpad. What is the exact model, and are only some keys affected, the whole keyboard not working, or is there physical or liquid damage?',
       href: '/service',
       actionLabel: 'Submit Keyboard Fault',
     };
@@ -147,7 +150,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && hingeContext) {
     return {
-      text: 'Yes. Hinge, bezel and laptop body/casing damage can be reviewed. Please tell me whether the hinge is loose, broken from the body, the screen back cover is cracked, or the bezel/base is damaged. Photos plus the exact model are useful because the repair may need a hinge set, cover, palm-rest or multiple parts.',
+      text: 'Yes, we can assess hinge and casing damage. What is the exact model, and is the hinge loose, broken away from the body, or is the cover/bezel also damaged?',
       href: '/service',
       actionLabel: 'Submit Physical Damage',
     };
@@ -155,15 +158,15 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (laptopContext && overheatingContext) {
     return {
-      text: 'Yes. For overheating, fan noise or thermal shutdown, ProPrint can inspect cooling fans, vents, heatsink condition and thermal compound. Please tell me whether the unit becomes hot, shuts down, shows a fan error, or runs very slowly, and provide the exact brand/model.',
+      text: 'We can check that. What is the exact model? Also tell me whether it is simply running slowly, becoming very hot, making loud fan noise, or shutting down by itself.',
       href: '/service',
-      actionLabel: 'Request Thermal Service',
+      actionLabel: 'Request Computer Diagnosis',
     };
   }
 
   if (laptopContext && etaQuestion) {
     return {
-      text: 'Computer repair ETA depends on diagnosis, exact model, required spare part and vendor availability. If the part is locally available the job can usually be scheduled sooner; special-order parts take longer. ProPrint should give a confirmed ETA only after the correct part and stock are checked.',
+      text: 'The repair time depends on the diagnosis and whether any required part is available locally. Give me the exact model and fault, and ProPrint can confirm the ETA after checking the required part.',
       href: '/service',
       actionLabel: 'Submit Computer Details',
     };
@@ -171,7 +174,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/(do you repair|can you repair|repair hp|repair dell|repair lenovo|laptop repair|desktop repair|computer repair)/.test(context)) {
     return {
-      text: 'Yes. ProPrint can accept laptop and desktop repair requests in Kuwait. Which brand/model do you have, and what is the problem? We can receive requests covering LCD/display, SSD/HDD, RAM upgrades, battery/charging, keyboard, hinges/body, overheating, no-power faults and general hardware diagnostics.',
+      text: 'Yes, ProPrint repairs laptops and desktops in Kuwait. What brand and model is your computer, and what problem are you having?',
       href: '/service',
       actionLabel: 'Start Computer Service Request',
     };
@@ -179,7 +182,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/^(printer|printer repair)$/i.test(input.trim())) {
     return {
-      text: 'Yes. ProPrint can accept printer repair requests in Kuwait. Which brand and model is the printer? For example HP, Canon, Epson, Brother, Xerox, Ricoh or Kyocera. Then tell me the symptom: paper jam, not feeding paper, not printing, error code, poor print quality, toner/ink issue, scanner/ADF issue, duplex problem, noise or another fault.',
+      text: 'Yes, we repair printers in Kuwait. What brand and model is the printer, and what problem are you having?',
       href: '/service',
       actionLabel: 'Open Printer Service Request',
     };
@@ -187,7 +190,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && paperJam) {
     return {
-      text: 'For a paper-jam or paper-feed problem, please tell me the printer brand/model and where the paper stops if you can see it: input tray, inside the printer, duplex section or output area. Also tell me whether it jams every page or only occasionally. The cause may be paper path debris, pickup/separation rollers, sensors, duplex components or another mechanical issue and must be diagnosed before parts are quoted.',
+      text: 'We can check the paper-jam or feed problem. What is the exact printer model, and does it jam every page or only sometimes? If you can see where the paper stops, tell me that too.',
       href: '/service',
       actionLabel: 'Submit Paper Feed Fault',
     };
@@ -195,7 +198,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && printQuality) {
     return {
-      text: 'For print-quality problems, please tell me the brand/model and what you see: faded print, vertical or horizontal lines, streaks, smudging, missing colours, blank pages, repeated marks or uneven density. The cause can vary between toner/ink, drum/imaging components, printhead, fuser or other parts, so the service team should diagnose before quoting replacement parts.',
+      text: 'We can check the print-quality issue. What is the exact printer model, and are you seeing faded print, lines, streaks, smudging, missing colours, blank pages or repeated marks?',
       href: '/service',
       actionLabel: 'Submit Print Quality Issue',
     };
@@ -203,7 +206,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && tonerInk) {
     return {
-      text: 'Yes. ProPrint can review toner, cartridge and ink-system issues. Please provide the printer brand/model, the exact error message if any, and whether you are using toner, cartridge bottles or an ink-tank system. Consumable replacement and hardware faults are different, so the exact model and symptom are needed before pricing.',
+      text: 'Yes, we can check toner, cartridge and ink-system issues. What is the exact printer model, and what error or symptom are you seeing?',
       href: '/service',
       actionLabel: 'Submit Toner / Ink Issue',
     };
@@ -211,7 +214,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && printerHardware) {
     return {
-      text: 'Yes. Printer hardware faults such as fuser, rollers, formatter/mainboard, scanner, ADF, duplex or motor-related issues can be assessed. Please send the exact printer model and fault/error. The final repair quotation and ETA depend on diagnosis and vendor availability of the required spare part.',
+      text: 'Yes, we can assess that printer hardware fault. Please give me the exact model and the error or symptom. Final part pricing and ETA are confirmed after diagnosis and a vendor stock check.',
       href: '/service',
       actionLabel: 'Submit Printer Hardware Fault',
     };
@@ -219,7 +222,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && printerError) {
     return {
-      text: 'Please provide the printer brand/model and the exact error code or message shown on the display/computer. If it simply does not print, tell me whether it is connected by USB, network/Wi-Fi, or shows Offline. This helps separate a configuration issue from a hardware fault.',
+      text: 'Please give me the exact printer model and the error code or message. If it simply does not print, tell me whether it is connected by USB, network/Wi-Fi, or shows Offline.',
       href: '/service',
       actionLabel: 'Submit Printer Error',
     };
@@ -227,7 +230,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && priceQuestion) {
     return {
-      text: 'Printer repair pricing depends on the model and diagnosed fault. ProPrint can advise the applicable service/diagnostic charge, but if a fuser, roller kit, formatter, printhead, scanner unit or other spare part is required, the complete quotation must include the current vendor part price. ETA is confirmed after the required part and availability are checked.',
+      text: 'Printer repair cost depends on the model and diagnosed fault. ProPrint can advise the service charge, while any required spare part is quoted at the current vendor price. Please give me the exact model and fault so the request can be checked.',
       href: '/service',
       actionLabel: 'Request Printer Quote',
     };
@@ -235,7 +238,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (printerContext && etaQuestion) {
     return {
-      text: 'Printer repair ETA depends on diagnosis and spare-part availability. Simple service or configuration work may be completed sooner, while jobs requiring a fuser, formatter, printhead, roller kit or other ordered part can take longer. ProPrint should confirm ETA after checking the model and part stock.',
+      text: 'Printer repair time depends on the diagnosis and spare-part availability. Please give me the exact model and fault; ProPrint can confirm the ETA after checking what the repair requires.',
       href: '/service',
       actionLabel: 'Submit Printer Details',
     };
@@ -243,7 +246,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/^(plotter|plotter repair)$/i.test(input.trim())) {
     return {
-      text: 'Yes. ProPrint can accept plotter and large-format printer repair requests in Kuwait. Which brand and model do you have, such as HP DesignJet, Canon imagePROGRAF or Epson SureColor? Then tell me the symptom: printhead/ink error, carriage fault, belt issue, media/roll feed problem, cutter problem, poor print quality, error code, paper jam or another fault.',
+      text: 'Yes, we repair plotters and large-format printers in Kuwait. What brand and model is the machine, and what problem are you having?',
       href: '/service',
       actionLabel: 'Open Plotter Service Request',
     };
@@ -251,7 +254,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (plotterContext && plotterPrinthead) {
     return {
-      text: 'For plotter printhead, nozzle, ink-system or maintenance-cartridge issues, please provide the exact plotter model and any error code. Tell me whether colours are missing, nozzles are blocked, the unit rejects a printhead/ink component, or there is an ink-system warning. Parts vary significantly by model, so the final quotation and ETA require vendor price and stock confirmation.',
+      text: 'We can check the printhead or ink-system fault. What is the exact plotter model, and is there an error code or message on the display?',
       href: '/service',
       actionLabel: 'Submit Plotter Ink-System Fault',
     };
@@ -259,7 +262,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (plotterContext && plotterMedia) {
     return {
-      text: 'For roll-feed, media, carriage, belt or cutter problems, please provide the exact plotter model and describe what happens: media not loading, skewing, carriage not moving, belt damaged, cutter not cutting, or paper jamming. These faults may require mechanical diagnosis and model-specific spare parts before a final quotation and ETA can be given.',
+      text: 'We can assess the media-feed, carriage, belt or cutter problem. What is the exact plotter model, and what happens when you try to print or load media?',
       href: '/service',
       actionLabel: 'Submit Plotter Mechanical Fault',
     };
@@ -267,7 +270,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (plotterContext && printQuality) {
     return {
-      text: 'For plotter print-quality issues, please tell me the exact model and whether you see banding, missing colours, lines, faded output, alignment problems or smudging. The cause can involve printheads, ink system, calibration, media settings or mechanical issues. Diagnosis comes first, then ProPrint can quote any required parts.',
+      text: 'We can check the plotter print-quality issue. What is the exact model, and are you seeing banding, missing colours, lines, faded output, alignment problems or smudging?',
       href: '/service',
       actionLabel: 'Submit Plotter Print Issue',
     };
@@ -275,7 +278,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (plotterContext && priceQuestion) {
     return {
-      text: 'Plotter repair pricing depends heavily on the exact model and diagnosed fault. ProPrint can advise the service/diagnostic charge, while printheads, belts, carriage assemblies, cutters, ink-system parts and other spares require current vendor pricing. The complete quotation and ETA are confirmed once the required part and stock are known.',
+      text: 'Plotter repair cost depends on the exact model and diagnosed fault. Service charges can be advised separately, while any required printhead or mechanical part needs current vendor pricing. Please give me the model and fault.',
       href: '/service',
       actionLabel: 'Request Plotter Quote',
     };
@@ -283,7 +286,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (plotterContext && etaQuestion) {
     return {
-      text: 'Plotter ETA depends on diagnosis and model-specific spare-part availability. ProPrint should confirm the expected completion time after identifying the required part and checking local or vendor stock rather than promising an inaccurate date.',
+      text: 'Plotter repair time depends on diagnosis and model-specific part availability. Please give me the exact model and fault; ProPrint can confirm the ETA after checking the required part.',
       href: '/service',
       actionLabel: 'Submit Plotter Details',
     };
@@ -291,7 +294,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/(do you repair printers|repair printer|printer service)/.test(context)) {
     return {
-      text: 'Yes. ProPrint can accept printer service requests. Please tell me the printer brand/model and what is wrong: paper jam/feed issue, print quality, toner/ink, error code, scanner/ADF, duplex, fuser/roller, not printing or another fault.',
+      text: 'Yes, ProPrint repairs printers in Kuwait. What is the brand and exact model, and what problem are you having?',
       href: '/service',
       actionLabel: 'Start Printer Service Request',
     };
@@ -299,7 +302,7 @@ function getReply(input: string, history: Message[] = []): Reply {
 
   if (/(do you repair plotters|repair plotter|plotter service|large format repair)/.test(context)) {
     return {
-      text: 'Yes. ProPrint can accept plotter and large-format printer service requests in Kuwait. Please provide the brand/model and symptom, such as printhead/ink-system fault, media feed, carriage/belt, cutter, print quality, error code or paper jam.',
+      text: 'Yes, ProPrint repairs plotters and large-format printers in Kuwait. What is the brand and exact model, and what problem are you having?',
       href: '/service',
       actionLabel: 'Start Plotter Service Request',
     };
@@ -346,7 +349,7 @@ function getReply(input: string, history: Message[] = []): Reply {
   }
 
   return {
-    text: 'I can help with product enquiries, laptop/desktop repair and upgrades, printer repair, plotter repair, AMC, enterprise IT and quotations in Kuwait. For service requests, tell me the equipment brand/model and the symptom or upgrade you need. I will keep the recent conversation in context and will not invent part prices or repair ETAs.',
+    text: 'Tell me what equipment you have and what you need help with. For a repair, the brand, exact model and symptom are the best place to start.',
   };
 }
 
@@ -360,7 +363,7 @@ export function ProPrintAssistant() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      text: 'Hello! I’m the ProPrint Assistant for Kuwait. I can help with products, laptop/desktop repairs and upgrades, printer and plotter repairs, AMC, enterprise IT and quotations. Tell me the equipment brand/model and what is wrong, or choose a quick option below.',
+      text: 'Hello! I’m the ProPrint Assistant for Kuwait. I can help with products, repairs, upgrades, AMC, enterprise IT and quotations. Tell me what you need help with, or choose a quick option below.',
     },
   ]);
 
