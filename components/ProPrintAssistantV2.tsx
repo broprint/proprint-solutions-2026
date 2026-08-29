@@ -12,21 +12,11 @@ const ROOT: Option[] = [
   { label: '🛡️ Warranty Check', value: 'menu:warranty' }, { label: '💻 Computers', value: 'menu:computers' }, { label: '🖨️ Printers', value: 'menu:printers' }, { label: '📐 Plotters', value: 'menu:plotters' }, { label: '🗄️ Servers', value: 'menu:servers' }, { label: '🌐 Enterprise IT', value: 'menu:enterprise' }, { label: '🛠️ AMC Support', value: 'menu:amc' }, { label: '🛒 Buy a Product', value: 'menu:shop' }, { label: '📄 Request a Quote', value: 'menu:quote' },
 ];
 const makeOptions = (labels:string[], prefix:string):Option[] => labels.map(label=>({label,value:`${prefix}:${label}`}));
-const warranty:Record<string,{url:string;label:string;hint:string}> = {
-  HP:{url:'https://support.hp.com/emea_middle_east-en/check-warranty',label:'Open HP Warranty Check',hint:'Have the serial number and country/region of purchase ready.'},
-  Lenovo:{url:'https://support.lenovo.com/kw/en/warranty-upgrade-and-services/',label:'Open Lenovo Warranty Lookup',hint:'For Lenovo PCs, workstations, servers and other devices.'},
-  Dell:{url:'https://www.dell.com/support/home/en-kw',label:'Open Dell Warranty & Support',hint:'Have the Service Tag or Product ID ready.'},
-  Epson:{url:'https://warrantycheck.epson.eu/',label:'Open Epson Warranty Check',hint:'Have the Epson serial number ready.'},
-  Apple:{url:'https://checkcoverage.apple.com/?locale=en_KW',label:'Open Apple Coverage Check',hint:'Have the Apple device serial number ready.'},
-  Samsung:{url:'https://www.samsung.com/ae/support/apps-services/how-to-check-my-warranty-information/',label:'Open Samsung Warranty Information',hint:'Samsung account, IMEI or serial number may be required.'},
-  Xiaomi:{url:'https://www.mi.com/ae-en/support/warranty/',label:'Open Xiaomi Warranty Information',hint:'Official Xiaomi warranty and service information.'},
-  Acer:{url:'https://www.acer.com/ae-en/support',label:'Open Acer Support',hint:'Use Acer official support for product and warranty assistance.'},
-  ASUS:{url:'https://www.asus.com/me-en/support/',label:'Open ASUS Support',hint:'Use ASUS official support for warranty and product assistance.'},
-  MSI:{url:'https://account.msi.com/services/warranty-book',label:'Open MSI Warranty Status',hint:'Sign in or use MSI support to check warranty information.'},
-  Canon:{url:'https://en.canon-me.com/support/',label:'Open Canon Support',hint:'Use Canon Middle East support for warranty/service information.'},
-  Brother:{url:'https://www.brother.ae/en/support',label:'Open Brother Support',hint:'Use Brother official support for warranty and service resources.'},
-  Huawei:{url:'https://consumer.huawei.com/kw-en/support/warranty-query/',label:'Open Huawei Warranty Query',hint:'Use the device serial number on Huawei Kuwait support.'},
-  'Microsoft Surface':{url:'https://account.microsoft.com/devices',label:'Open Microsoft Devices',hint:'Sign in and select your registered Surface device to review warranty information.'},
+const warranty:Record<string,{url?:string;label?:string;hint:string}> = {
+  HP:{url:'https://support.hp.com/emea_middle_east-en/check-warranty',label:'Open HP Warranty Check',hint:'For supported HP products including HP DesignJet plotters. Have the serial number and country/region of purchase ready.'},
+  Lenovo:{url:'https://support.lenovo.com/kw/en/warranty-upgrade-and-services/',label:'Open Lenovo Warranty Lookup',hint:'For supported Lenovo products. Have the device serial number ready.'},
+  MSI:{url:'https://account.msi.com/services/warranty-book',label:'Open MSI Warranty Status',hint:'For supported MSI products. Sign in or use MSI support to check warranty information.'},
+  Honeywell:{hint:'For supported Honeywell equipment, submit the exact model and serial number to ProPrint so warranty/service eligibility can be checked.'},
 };
 const warrantyBrands = Object.keys(warranty);
 
@@ -36,8 +26,8 @@ function replyFor(raw:string):Reply{
  const token=raw.includes(':')?raw:typedIntent(raw); const lower=raw.toLowerCase();
  if(/outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international/.test(lower))return{text:'This assistant is configured for Kuwait enquiries only.',href:'/contact',actionLabel:'Contact ProPrint'};
  if(raw==='root'||!token)return{text:'What can we help you with?',options:ROOT};
- if(token==='menu:warranty')return{text:'Choose your device brand. We can open the official manufacturer warranty/support portal even for brands where ProPrint is not an authorized warranty provider.',options:makeOptions(warrantyBrands,'warranty-brand'),href:'/customer-care?service=warranty',actionLabel:'Open ProPrint Warranty Support'};
- if(token.startsWith('warranty-brand:')){const brand=token.slice('warranty-brand:'.length);const item=warranty[brand];return item?{text:`${brand} selected. ${item.hint} Warranty status and eligibility are determined by ${brand}; this link does not imply ProPrint is an authorized warranty provider for the brand.`,externalHref:item.url,externalLabel:item.label,href:'/customer-care?service=warranty',actionLabel:'Contact ProPrint for Warranty Help'}:{text:'Please use ProPrint Customer Care for warranty assistance.',href:'/customer-care?service=warranty',actionLabel:'Open Warranty Support'};}
+ if(token==='menu:warranty')return{text:'Choose a currently supported warranty brand. ProPrint warranty assistance is presently available for HP, Lenovo, MSI and Honeywell, including HP DesignJet plotters.',options:makeOptions(warrantyBrands,'warranty-brand'),href:'/customer-care?service=warranty',actionLabel:'Open ProPrint Warranty Support'};
+ if(token.startsWith('warranty-brand:')){const brand=token.slice('warranty-brand:'.length);const item=warranty[brand];if(!item)return{text:'Please use ProPrint Customer Care for warranty assistance.',href:'/customer-care?service=warranty',actionLabel:'Open Warranty Support'};return{text:`${brand} selected. ${item.hint}`,externalHref:item.url,externalLabel:item.label,href:'/customer-care?service=warranty',actionLabel:'Contact ProPrint for Warranty Help'};}
  if(token==='menu:computers')return{text:'Choose the computer brand:',options:makeOptions(['HP','Dell','Lenovo','MSI','ASUS','Acer','Apple','Other Brand'],'computer-brand')};
  if(token.startsWith('computer-brand:')){const brand=token.slice(15);return{text:`${brand} selected. What type of computer is it?`,options:makeOptions(['Laptop','Desktop','Workstation','Not Sure'],`computer-type:${brand}`)}}
  if(token.startsWith('computer-type:')){const[,brand,device]=token.split(':');return{text:`${brand} ${device}. What do you need help with?`,options:makeOptions(['Slow Performance','SSD Upgrade','RAM Upgrade','Broken Screen','Battery / Charging','Keyboard / Touchpad','Overheating / Fan','No Power / No Boot','Hinge / Body Damage','Windows / Software','Other Problem'],`computer-problem:${brand}:${device}`)}}
