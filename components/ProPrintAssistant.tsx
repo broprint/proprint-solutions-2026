@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Bot, ChevronRight, Headphones, MessageCircle, Send, X } from 'lucide-react';
+import { Bot, ChevronRight, Headphones, MessageCircle, Send, UserRoundCheck, X } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
 
 type Reply = {
@@ -16,6 +16,12 @@ type Message = {
   reply?: Reply;
 };
 
+type LeadState = {
+  name: string;
+  phone: string;
+  company: string;
+};
+
 const QUICK_ACTIONS = [
   'Buy a Product',
   'Printer / Plotter Repair',
@@ -28,11 +34,11 @@ const QUICK_ACTIONS = [
 function getReply(input: string): Reply {
   const text = input.toLowerCase();
 
-  if (/(price|stock|availability|available|buy|product|printer|plotter|laptop|desktop|monitor|network|server|storage)/.test(text) && !/(repair|service|fix|broken|fault)/.test(text)) {
+  if (/(outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international|overseas)/.test(text)) {
     return {
-      text: 'I can help you browse ProPrint products for Kuwait. Website prices and availability are currently indicative for the management demo, so final stock and commercial pricing should be confirmed by ProPrint.',
-      href: '/shop',
-      actionLabel: 'Browse Products',
+      text: 'This ProPrint website assistant is currently configured for Kuwait enquiries only. For any requirement outside Kuwait, please contact ProPrint directly before assuming delivery or service coverage.',
+      href: '/contact',
+      actionLabel: 'Contact ProPrint',
     };
   }
 
@@ -76,11 +82,11 @@ function getReply(input: string): Reply {
     };
   }
 
-  if (/(outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international|overseas)/.test(text)) {
+  if (/(price|stock|availability|available|buy|product|printer|plotter|laptop|desktop|monitor|network|server|storage)/.test(text)) {
     return {
-      text: 'This ProPrint website assistant is currently configured for Kuwait enquiries only. For any requirement outside Kuwait, please contact ProPrint directly before assuming delivery or service coverage.',
-      href: '/contact',
-      actionLabel: 'Contact ProPrint',
+      text: 'I can help you browse ProPrint products for Kuwait. Website prices and availability are currently indicative for the management demo, so final stock and commercial pricing should be confirmed by ProPrint.',
+      href: '/shop',
+      actionLabel: 'Browse Products',
     };
   }
 
@@ -92,6 +98,10 @@ function getReply(input: string): Reply {
 export function ProPrintAssistant() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
+  const [leadOpen, setLeadOpen] = useState(false);
+  const [lead, setLead] = useState<LeadState>({ name: '', phone: '', company: '' });
+  const [leadStatus, setLeadStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [leadMessage, setLeadMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -118,10 +128,58 @@ export function ProPrintAssistant() {
     ask(input);
   }
 
+  async function submitLead(event: FormEvent) {
+    event.preventDefault();
+    if (!lead.name.trim() || !lead.phone.trim()) {
+      setLeadStatus('error');
+      setLeadMessage('Please enter your name and Kuwait contact number.');
+      return;
+    }
+
+    setLeadStatus('sending');
+    setLeadMessage('');
+
+    const conversation = messages
+      .filter((message) => message.role === 'user')
+      .slice(-4)
+      .map((message) => message.text)
+      .join(' | ');
+
+    try {
+      const response = await fetch('/api/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'quote',
+          name: lead.name,
+          phone: lead.phone,
+          company: lead.company,
+          requirement: 'Website assistant callback',
+          message: conversation
+            ? `Chatbot callback request. Recent customer enquiry: ${conversation}`
+            : 'Chatbot callback request from the ProPrint Kuwait website assistant.',
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to submit request.');
+
+      setLeadStatus('success');
+      setLeadMessage(
+        data.delivery === 'demo'
+          ? `Request ${data.reference} created for this management demo. Live email delivery is not enabled yet.`
+          : `Thank you. Request ${data.reference} has been submitted to ProPrint.`
+      );
+    } catch (error) {
+      setLeadStatus('error');
+      setLeadMessage(error instanceof Error ? error.message : 'Unable to submit your request right now.');
+    }
+  }
+
   return (
     <div className="fixed bottom-4 right-4 z-[70] sm:bottom-6 sm:right-6">
       {open && (
-        <section className="mb-3 flex h-[min(650px,78vh)] w-[calc(100vw-2rem)] max-w-[390px] flex-col overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-2xl shadow-slate-950/20" aria-label="ProPrint Assistant">
+        <section className="mb-3 flex h-[min(680px,80vh)] w-[calc(100vw-2rem)] max-w-[400px] flex-col overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-2xl shadow-slate-950/20" aria-label="ProPrint Assistant">
           <div className="bg-[#061321] px-5 py-4 text-white">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
@@ -158,6 +216,26 @@ export function ProPrintAssistant() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-3">
+              <button onClick={() => { setLeadOpen((value) => !value); setLeadStatus('idle'); setLeadMessage(''); }} className="flex w-full items-center justify-between gap-3 text-left">
+                <span className="flex items-center gap-2 text-sm font-black text-slate-800"><UserRoundCheck size={17} className="text-[#0b5cff]" />Have ProPrint contact me</span>
+                <ChevronRight size={16} className={`text-slate-500 transition ${leadOpen ? 'rotate-90' : ''}`} />
+              </button>
+
+              {leadOpen && (
+                <form onSubmit={submitLead} className="mt-3 space-y-2">
+                  <input value={lead.name} onChange={(event) => setLead((current) => ({ ...current, name: event.target.value }))} placeholder="Name *" autoComplete="name" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#0b5cff]" />
+                  <input value={lead.phone} onChange={(event) => setLead((current) => ({ ...current, phone: event.target.value }))} placeholder="Kuwait phone *" inputMode="tel" autoComplete="tel" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#0b5cff]" />
+                  <input value={lead.company} onChange={(event) => setLead((current) => ({ ...current, company: event.target.value }))} placeholder="Company (optional)" autoComplete="organization" className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-[#0b5cff]" />
+                  <button type="submit" disabled={leadStatus === 'sending'} className="w-full rounded-xl bg-[#0b5cff] px-4 py-2.5 text-sm font-black text-white disabled:opacity-60">
+                    {leadStatus === 'sending' ? 'Submitting…' : 'Request a Callback'}
+                  </button>
+                  {leadMessage && <p className={`text-xs leading-5 ${leadStatus === 'error' ? 'text-red-600' : 'text-slate-600'}`}>{leadMessage}</p>}
+                  <p className="text-[10px] leading-4 text-slate-400">For the management demo, a reference can be generated even while live email delivery remains disabled.</p>
+                </form>
+              )}
             </div>
           </div>
 
