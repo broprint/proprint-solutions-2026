@@ -11,7 +11,7 @@ export type Product = {
   image?: string;
   imageAlt?: string;
   sku?: string;
-  stock?: 'In stock' | 'Low stock' | 'Request availability' | 'Quote only';
+  stock?: 'In stock' | 'Low stock' | 'Available on order' | 'Request availability' | 'Out of stock' | 'Quote only';
 };
 
 // Product photos are intentionally optional. When a verified manufacturer/product
