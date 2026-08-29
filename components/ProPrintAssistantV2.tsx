@@ -1,0 +1,211 @@
+'use client';
+
+import Link from 'next/link';
+import { Bot, ChevronRight, MessageCircle, Send, UserRoundCheck, X } from 'lucide-react';
+import { FormEvent, useState } from 'react';
+
+type Option = { label: string; value: string };
+type Reply = { text: string; options?: Option[]; href?: string; actionLabel?: string };
+type Message = { role: 'assistant' | 'user'; text: string; reply?: Reply };
+
+const ROOT: Option[] = [
+  { label: '💻 Computers', value: 'menu:computers' },
+  { label: '🖨️ Printers', value: 'menu:printers' },
+  { label: '📐 Plotters', value: 'menu:plotters' },
+  { label: '🗄️ Servers', value: 'menu:servers' },
+  { label: '🌐 Enterprise IT', value: 'menu:enterprise' },
+  { label: '🛠️ AMC Support', value: 'menu:amc' },
+  { label: '🛒 Buy a Product', value: 'menu:shop' },
+  { label: '📄 Request a Quote', value: 'menu:quote' },
+];
+
+const makeOptions = (labels: string[], prefix: string): Option[] => labels.map((label) => ({ label, value: `${prefix}:${label}` }));
+
+function typedIntent(text: string) {
+  const t = text.toLowerCase();
+  if (/server|poweredge|proliant|thinksystem|raid/.test(t)) return 'menu:servers';
+  if (/plotter|designjet|imageprograf|surecolor|large format/.test(t)) return 'menu:plotters';
+  if (/printer|paper jam|ink|toner|wifi|wi-fi|colour|color|print quality/.test(t)) return 'menu:printers';
+  if (/laptop|desktop|computer|pc|ssd|ram|screen|battery|keyboard|overheat/.test(t)) return 'menu:computers';
+  if (/amc|annual maintenance/.test(t)) return 'menu:amc';
+  if (/enterprise|network|infrastructure|onsite|it support/.test(t)) return 'menu:enterprise';
+  if (/buy|shop|product|stock/.test(t)) return 'menu:shop';
+  if (/quote|quotation|rfq/.test(t)) return 'menu:quote';
+  return null;
+}
+
+function replyFor(raw: string): Reply {
+  const token = raw.includes(':') ? raw : typedIntent(raw);
+  const lower = raw.toLowerCase();
+
+  if (/outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international/.test(lower)) {
+    return { text: 'This assistant is configured for Kuwait enquiries only.', href: '/contact', actionLabel: 'Contact ProPrint' };
+  }
+
+  if (raw === 'root' || !token) return { text: 'What can we help you with?', options: ROOT };
+
+  if (token === 'menu:computers') return { text: 'Choose the computer brand:', options: makeOptions(['HP', 'Dell', 'Lenovo', 'MSI', 'ASUS', 'Acer', 'Apple', 'Other Brand'], 'computer-brand') };
+  if (token.startsWith('computer-brand:')) {
+    const brand = token.slice('computer-brand:'.length);
+    return { text: `${brand} selected. What type of computer is it?`, options: makeOptions(['Laptop', 'Desktop', 'Workstation', 'Not Sure'], `computer-type:${brand}`) };
+  }
+  if (token.startsWith('computer-type:')) {
+    const [, brand, device] = token.split(':');
+    return { text: `${brand} ${device}. What do you need help with?`, options: makeOptions(['Slow Performance', 'SSD Upgrade', 'RAM Upgrade', 'Broken Screen', 'Battery / Charging', 'Keyboard / Touchpad', 'Overheating / Fan', 'No Power / No Boot', 'Hinge / Body Damage', 'Windows / Software', 'Other Problem'], `computer-problem:${brand}:${device}`) };
+  }
+  if (token.startsWith('computer-problem:')) {
+    const [, brand, device, problem] = token.split(':');
+    if (problem === 'SSD Upgrade') return { text: `Choose the SSD capacity for your ${brand} ${device}:`, options: makeOptions(['500GB', '1TB', '2TB'], `ssd:${brand}:${device}`) };
+    if (problem === 'RAM Upgrade') return { text: `Choose the RAM size to check for your ${brand} ${device}:`, options: makeOptions(['8GB', '16GB', '32GB', '64GB', 'Not Sure'], `ram:${brand}:${device}`) };
+    return { text: `${problem} selected for your ${brand} ${device}. Please enter the exact model if known, or start a service request.`, href: '/service', actionLabel: 'Start Computer Service Request' };
+  }
+  if (token.startsWith('ssd:')) {
+    const [, brand, device, capacity] = token.split(':');
+    return { text: `${capacity} SSD selected for your ${brand} ${device}. What would you like included?`, options: makeOptions(['SSD Installation Only', 'Clone / Transfer My Data', 'Fresh Windows Installation', 'I Need Advice'], `ssd-service:${brand}:${device}:${capacity}`) };
+  }
+  if (token.startsWith('ssd-service:')) {
+    const [, brand, device, capacity, service] = token.split(':');
+    return { text: `${capacity} SSD with “${service}” selected for your ${brand} ${device}. ProPrint will confirm compatibility and the current price after checking the exact model.`, href: '/service', actionLabel: `Request ${capacity} SSD Price` };
+  }
+  if (token.startsWith('ram:')) {
+    const [, brand, device, amount] = token.split(':');
+    return { text: `${amount} RAM selected for your ${brand} ${device}. Compatibility and price will be confirmed after checking the exact model.`, href: '/service', actionLabel: `Request ${amount} RAM Price` };
+  }
+
+  if (token === 'menu:printers') return { text: 'Choose the printer brand:', options: makeOptions(['HP', 'Canon', 'Epson', 'Brother', 'Xerox', 'Ricoh', 'Kyocera', 'Other Brand'], 'printer-brand') };
+  if (token.startsWith('printer-brand:')) {
+    const brand = token.slice('printer-brand:'.length);
+    return {
+      text: `${brand} printer selected. What problem are you having?`,
+      options: makeOptions([
+        'Paper Jam',
+        'Paper Not Feeding',
+        'Not Printing',
+        'Not Printing Color',
+        'Black Not Printing',
+        'Faded / Not Clear',
+        'Lines / Streaks',
+        'Smudged Print',
+        'Blank Pages',
+        'Wrong / Missing Colors',
+        'Need Ink / Toner',
+        'Ink / Toner Error',
+        'Not Printing Through Wi-Fi',
+        'Network / Ethernet Problem',
+        'USB Printing Problem',
+        'Printer Shows Offline',
+        'Scanner Not Working',
+        'ADF / Document Feeder Problem',
+        'Duplex / Two-Sided Problem',
+        'Fuser / Heating Problem',
+        'Roller / Pickup Problem',
+        'Error Code / Message',
+        'Slow Printing',
+        'Noise / Mechanical Problem',
+        'Driver / Software Problem',
+        'Other Printer Problem'
+      ], `printer-problem:${brand}`)
+    };
+  }
+  if (token.startsWith('printer-problem:')) {
+    const [, brand, problem] = token.split(':');
+    const followups: Record<string, string> = {
+      'Paper Jam': 'Where does the paper jam — tray, inside the printer, duplex area or output area?',
+      'Paper Not Feeding': 'Does the printer pick up no paper, multiple sheets, or feed only sometimes?',
+      'Not Printing Color': 'Are all colors missing, or only one color such as cyan, magenta or yellow?',
+      'Black Not Printing': 'Is black completely missing, faint, or intermittent?',
+      'Faded / Not Clear': 'Is the whole page faded, only one side, or are some colors faint?',
+      'Lines / Streaks': 'Are the lines vertical or horizontal, and are they black or colored?',
+      'Not Printing Through Wi-Fi': 'Does the printer show connected to Wi-Fi, and does your computer/phone show the printer as Offline?',
+      'Network / Ethernet Problem': 'Is the network cable connected, and does the printer have an IP address?',
+      'Printer Shows Offline': 'Is the printer connected by USB, Wi-Fi or Ethernet?',
+      'Need Ink / Toner': 'Please provide the exact printer model so the correct ink or toner can be identified.',
+      'Error Code / Message': 'Please enter the exact error code or message shown on the printer.'
+    };
+    return {
+      text: `${problem} selected for your ${brand} printer. ${followups[problem] ?? 'Please provide the exact printer model and describe what happens.'}`,
+      href: '/service',
+      actionLabel: 'Start Printer Service Request',
+      options: [{ label: '⬅️ Choose Another Printer Problem', value: `printer-brand:${brand}` }]
+    };
+  }
+
+  if (token === 'menu:plotters') return { text: 'Choose the plotter / large-format brand:', options: makeOptions(['HP DesignJet', 'Canon imagePROGRAF', 'Epson SureColor', 'Other Brand'], 'plotter-brand') };
+  if (token.startsWith('plotter-brand:')) {
+    const brand = token.slice('plotter-brand:'.length);
+    return { text: `${brand} selected. What problem are you having?`, options: makeOptions(['Printhead Error', 'Ink System', 'Carriage Problem', 'Belt Problem', 'Media / Roll Feed', 'Cutter Problem', 'Print Quality', 'Paper Jam', 'Error Code', 'Other Problem'], `plotter-problem:${brand}`) };
+  }
+  if (token.startsWith('plotter-problem:')) {
+    const [, brand, problem] = token.split(':');
+    return { text: `${problem} selected for your ${brand}. Please provide the exact model and any error code.`, href: '/service', actionLabel: 'Start Plotter Service Request' };
+  }
+
+  if (token === 'menu:servers') return { text: 'Choose the server brand / platform:', options: makeOptions(['HPE', 'Dell PowerEdge', 'Lenovo ThinkSystem', 'Other Brand'], 'server-brand') };
+  if (token.startsWith('server-brand:')) {
+    const brand = token.slice('server-brand:'.length);
+    return { text: `${brand} server selected. What do you need help with?`, options: makeOptions(['No Power / No Boot', 'RAID / Storage', 'Disk Failure', 'Windows Server / OS', 'Network Issue', 'Slow Performance', 'Memory / CPU Upgrade', 'Controller / Hardware Fault', 'Firmware / BIOS', 'Other Server Issue'], `server-problem:${brand}`) };
+  }
+  if (token.startsWith('server-problem:')) {
+    const [, brand, problem] = token.split(':');
+    return { text: `${problem} selected for your ${brand} server. Please provide the exact model, current error/message and RAID level if relevant.`, href: '/enterprise', actionLabel: 'Request Server Support' };
+  }
+
+  if (token === 'menu:enterprise') return { text: 'Choose the enterprise IT area:', options: makeOptions(['Servers', 'Networking', 'Wi-Fi', 'Microsoft 365', 'Workstations / Endpoints', 'Onsite IT Support', 'Infrastructure / Cabling', 'Other IT Requirement'], 'enterprise') , href: '/enterprise', actionLabel: 'View Enterprise IT' };
+  if (token.startsWith('enterprise:')) return { text: `${token.slice('enterprise:'.length)} selected. Tell us briefly what you need.`, href: '/enterprise', actionLabel: 'Submit Enterprise Requirement' };
+  if (token === 'menu:amc') return { text: 'What would you like covered under AMC?', options: makeOptions(['Computers', 'Printers', 'Plotters', 'Servers', 'Network / Wi-Fi', 'Complete Office IT'], 'amc'), href: '/amc', actionLabel: 'View AMC Services' };
+  if (token.startsWith('amc:')) return { text: `${token.slice('amc:'.length)} AMC selected. ProPrint can prepare the scope based on device count, brands/models and support level.`, href: '/quote', actionLabel: 'Request AMC Quote' };
+  if (token === 'menu:shop') return { text: 'What type of product are you looking for?', options: makeOptions(['Laptops / PCs', 'Printers', 'Plotters', 'Servers / Storage', 'Networking', 'Monitors', 'UPS / Power', 'Consumables', 'Accessories'], 'shop'), href: '/shop', actionLabel: 'Browse Shop' };
+  if (token.startsWith('shop:')) return { text: `${token.slice('shop:'.length)} selected. Browse the demo catalog; final stock and commercial pricing are confirmed by ProPrint.`, href: '/shop', actionLabel: 'Browse Products' };
+  if (token === 'menu:quote') return { text: 'What do you need a quotation for?', options: makeOptions(['Products', 'Computer Repair', 'Printer Repair', 'Plotter Repair', 'Server Support', 'AMC', 'Enterprise IT'], 'quote'), href: '/quote', actionLabel: 'Open Quote Form' };
+  if (token.startsWith('quote:')) return { text: `${token.slice('quote:'.length)} quotation selected.`, href: '/quote', actionLabel: 'Request a Quote' };
+
+  return { text: 'What can we help you with?', options: ROOT };
+}
+
+export function ProPrintAssistantV2() {
+  const [open, setOpen] = useState(false);
+  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([{ role: 'assistant', text: 'Hello! I’m the ProPrint Assistant for Kuwait. What can we help you with?', reply: { text: '', options: ROOT } }]);
+  const [leadOpen, setLeadOpen] = useState(false);
+  const [lead, setLead] = useState({ name: '', phone: '', company: '' });
+  const [leadMessage, setLeadMessage] = useState('');
+
+  function ask(value: string, label?: string) {
+    const clean = value.trim();
+    if (!clean) return;
+    const reply = replyFor(clean);
+    setMessages((current) => [...current, { role: 'user', text: label ?? clean }, { role: 'assistant', text: reply.text, reply }]);
+    setInput('');
+  }
+
+  function submit(event: FormEvent) { event.preventDefault(); ask(input); }
+
+  async function submitLead(event: FormEvent) {
+    event.preventDefault();
+    if (!lead.name.trim() || !lead.phone.trim()) { setLeadMessage('Please enter your name and Kuwait contact number.'); return; }
+    const conversation = messages.filter((m) => m.role === 'user').slice(-10).map((m) => m.text).join(' | ');
+    try {
+      const response = await fetch('/api/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'quote', name: lead.name, phone: lead.phone, company: lead.company, requirement: 'Website assistant callback', message: `Chatbot callback request. Recent customer enquiry: ${conversation}` }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Unable to submit request.');
+      setLeadMessage(data.delivery === 'demo' ? `Request ${data.reference} created for this management demo. Live email delivery is not enabled yet.` : `Thank you. Request ${data.reference} has been submitted to ProPrint.`);
+    } catch (error) { setLeadMessage(error instanceof Error ? error.message : 'Unable to submit request.'); }
+  }
+
+  return <div className="fixed bottom-4 right-4 z-[70] sm:bottom-6 sm:right-6">
+    {open && <section className="mb-3 flex h-[min(700px,82vh)] w-[calc(100vw-2rem)] max-w-[420px] flex-col overflow-hidden rounded-[26px] border border-slate-200 bg-white shadow-2xl" aria-label="ProPrint Assistant">
+      <div className="bg-[#061321] px-5 py-4 text-white"><div className="flex items-center justify-between"><div className="flex items-center gap-3"><div className="grid h-10 w-10 place-items-center rounded-2xl bg-[#0b5cff]"><Bot size={21}/></div><div><p className="font-black">ProPrint Assistant</p><p className="text-xs text-slate-300">Kuwait sales & support guide</p></div></div><button onClick={() => setOpen(false)} className="rounded-xl p-2"><X size={19}/></button></div></div>
+      <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-4">
+        {messages.map((message, index) => <div key={`${message.role}-${index}`} className={message.role === 'user' ? 'ml-8' : 'mr-4'}>
+          {message.text && <div className={message.role === 'user' ? 'rounded-2xl rounded-br-md bg-[#0b5cff] px-4 py-3 text-sm leading-6 text-white' : 'rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm'}>{message.text}</div>}
+          {message.reply?.options && <div className="mt-2 flex flex-wrap gap-2">{message.reply.options.map((option) => <button key={`${index}-${option.value}`} onClick={() => ask(option.value, option.label)} className="rounded-full border border-blue-200 bg-white px-3 py-2 text-xs font-black text-[#0b5cff] shadow-sm hover:border-[#0b5cff] hover:bg-blue-50">{option.label}</button>)}</div>}
+          {message.reply?.href && <Link href={message.reply.href} onClick={() => setOpen(false)} className="mt-2 inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-black text-[#0b5cff] shadow-sm ring-1 ring-slate-200">{message.reply.actionLabel}<ChevronRight size={14}/></Link>}
+        </div>)}
+        <button onClick={() => ask('root', 'Main Menu')} className="rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-600">⌂ Main Menu</button>
+        <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-3"><button onClick={() => setLeadOpen((v) => !v)} className="flex w-full items-center justify-between text-left"><span className="flex items-center gap-2 text-sm font-black"><UserRoundCheck size={17} className="text-[#0b5cff]"/>Have ProPrint contact me</span><ChevronRight size={16}/></button>{leadOpen && <form onSubmit={submitLead} className="mt-3 space-y-2"><input value={lead.name} onChange={(e)=>setLead({...lead,name:e.target.value})} placeholder="Name *" className="w-full rounded-xl border px-3 py-2.5 text-sm"/><input value={lead.phone} onChange={(e)=>setLead({...lead,phone:e.target.value})} placeholder="Kuwait phone *" className="w-full rounded-xl border px-3 py-2.5 text-sm"/><input value={lead.company} onChange={(e)=>setLead({...lead,company:e.target.value})} placeholder="Company (optional)" className="w-full rounded-xl border px-3 py-2.5 text-sm"/><button className="w-full rounded-xl bg-[#0b5cff] px-4 py-2.5 text-sm font-black text-white">Request a Callback</button>{leadMessage && <p className="text-xs leading-5 text-slate-600">{leadMessage}</p>}</form>}</div>
+      </div>
+      <div className="border-t bg-white p-3"><form onSubmit={submit} className="flex items-center gap-2"><input value={input} onChange={(e)=>setInput(e.target.value)} placeholder="Or type your problem..." className="min-w-0 flex-1 rounded-full border bg-slate-50 px-4 py-3 text-sm"/><button className="grid h-11 w-11 place-items-center rounded-full bg-[#f47b20] text-white"><Send size={17}/></button></form></div>
+    </section>}
+    <button onClick={() => setOpen((v)=>!v)} className="ml-auto flex items-center gap-2 rounded-full bg-[#0b5cff] px-4 py-3.5 font-black text-white shadow-xl">{open ? <X size={20}/> : <MessageCircle size={20}/>}<span className="hidden sm:inline">Ask ProPrint</span></button>
+  </div>;
+}
