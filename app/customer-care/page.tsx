@@ -10,10 +10,13 @@ export const metadata = {
 type ServiceKey = 'warranty' | 'pickup' | 'status';
 
 const warrantyLinks = [
-  { brand: 'HP', label: 'HP Warranty Check', href: 'https://support.hp.com/emea_middle_east-en/check-warranty', hint: 'Serial number + country/region of purchase' },
-  { brand: 'Lenovo', label: 'Lenovo Warranty Lookup', href: 'https://support.lenovo.com/kw/en/warranty-upgrade-and-services/', hint: 'PCs, workstations, servers and other Lenovo devices' },
-  { brand: 'Dell', label: 'Dell Warranty & Support', href: 'https://www.dell.com/support/home/en-kw', hint: 'Use the Dell Service Tag or Product ID' },
-  { brand: 'Epson', label: 'Epson Warranty Check', href: 'https://warrantycheck.epson.eu/', hint: 'Use the Epson serial number' },
+  { brand: 'HP', label: 'HP Warranty Check', href: 'https://support.hp.com/emea_middle_east-en/check-warranty', hint: 'Serial number + country/region of purchase', support: 'ProPrint-supported brand' },
+  { brand: 'Lenovo', label: 'Lenovo Warranty Lookup', href: 'https://support.lenovo.com/kw/en/warranty-upgrade-and-services/', hint: 'PCs, workstations, servers and other Lenovo devices', support: 'ProPrint-supported brand' },
+  { brand: 'Dell', label: 'Dell Warranty & Support', href: 'https://www.dell.com/support/home/en-kw', hint: 'Use the Dell Service Tag or Product ID', support: 'ProPrint-supported brand' },
+  { brand: 'Epson', label: 'Epson Warranty Check', href: 'https://warrantycheck.epson.eu/', hint: 'Use the Epson serial number', support: 'ProPrint-supported brand' },
+  { brand: 'Apple', label: 'Apple Coverage Check', href: 'https://checkcoverage.apple.com/?locale=en_KW', hint: 'Use the Apple device serial number', support: 'Official manufacturer portal' },
+  { brand: 'Samsung', label: 'Samsung Warranty Information', href: 'https://www.samsung.com/ae/support/apps-services/how-to-check-my-warranty-information/', hint: 'Samsung account, IMEI or serial number may be required', support: 'Official manufacturer portal' },
+  { brand: 'Xiaomi', label: 'Xiaomi Warranty Information', href: 'https://www.mi.com/ae-en/support/warranty/', hint: 'Review official Xiaomi warranty terms and service information', support: 'Official manufacturer portal' },
 ];
 
 export default async function CustomerCarePage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
@@ -29,7 +32,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
           <div className="mt-8 max-w-3xl">
             <div className="text-[11px] font-black uppercase tracking-[.2em] text-[#57a7ff]">ProPrint Customer Care</div>
             <h1 className="mt-3 text-4xl font-black tracking-[-.04em] sm:text-5xl">Warranty, pickup and service-status support in one place.</h1>
-            <p className="mt-5 max-w-2xl leading-7 text-slate-300">Check supported manufacturer warranty portals or submit equipment details to ProPrint for assistance. Manufacturer warranty status is determined by the manufacturer, not by this website.</p>
+            <p className="mt-5 max-w-2xl leading-7 text-slate-300">Use official manufacturer warranty portals for supported and non-supported brands, or submit equipment details to ProPrint for assistance. Manufacturer warranty status is determined by the manufacturer, not by this website.</p>
           </div>
         </div>
       </section>
@@ -42,7 +45,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
               <div>
                 <div className="text-[11px] font-black uppercase tracking-[.18em] text-[#0b5cff]">Official Manufacturer Portals</div>
                 <h2 className="mt-2 text-2xl font-black tracking-[-.03em]">Check your device warranty</h2>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Select your brand to open its official warranty/support website in a new tab. Keep the device serial number, product number or Service Tag ready.</p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Select your brand to open its official warranty/support website in a new tab. We include useful manufacturer portals even where ProPrint does not currently provide authorized warranty service.</p>
               </div>
             </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -51,10 +54,11 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
                   <div className="flex items-center justify-between gap-3"><span className="text-lg font-black text-slate-900">{item.brand}</span><ExternalLink size={16} className="text-[#0b5cff]"/></div>
                   <div className="mt-2 text-sm font-black text-[#0b5cff]">{item.label}</div>
                   <p className="mt-2 text-xs leading-5 text-slate-500">{item.hint}</p>
+                  <div className="mt-3 text-[10px] font-black uppercase tracking-[.12em] text-slate-400">{item.support}</div>
                 </a>
               ))}
             </div>
-            <p className="mt-5 text-xs leading-5 text-slate-500">External warranty results are provided by the respective manufacturer. If you need help identifying the product or arranging service, submit a ProPrint Warranty Support request below.</p>
+            <p className="mt-5 text-xs leading-5 text-slate-500">External warranty results and service eligibility are provided by the respective manufacturer. A manufacturer link does not imply that ProPrint is an authorized warranty provider for that brand. If you need help identifying the product or arranging available service, submit a ProPrint Warranty Support request below.</p>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
