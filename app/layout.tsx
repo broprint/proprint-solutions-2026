@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProPrintAssistantV2 } from "@/components/ProPrintAssistantV2";
+import { ProPrintChatAutoScroll } from "@/components/ProPrintChatAutoScroll";
 
 export const metadata: Metadata = {
   title: {
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <main>{children}</main>
         <Footer />
         <ProPrintAssistantV2 />
+        <ProPrintChatAutoScroll />
       </body>
     </html>
   );
