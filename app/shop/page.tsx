@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Building2, Headphones, Truck } from 'lucide-react';
 import { ShopCatalog } from '@/components/ShopCatalog';
-import { products } from '@/data/catalog';
+import { getStoreProducts } from '@/lib/products';
 
 const trustItems = [
   [BadgeCheck, 'Genuine products', 'Technology from trusted brands'],
@@ -10,7 +10,9 @@ const trustItems = [
   [Building2, 'Business procurement', 'Bulk quotes, deployment and AMC'],
 ] as const;
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  const products = await getStoreProducts();
+
   return (
     <main>
       <section className="relative overflow-hidden bg-[#061321] py-16 text-white md:py-20">
