@@ -41,7 +41,7 @@ export function Header(){
   <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
    <div className="container flex min-h-[76px] items-center gap-3 sm:gap-5">
     <Link href="/" className="shrink-0" aria-label="ProPrint Solutions home"><img src="/proprint-logo.png" alt="ProPrint Solutions" className="h-auto w-[155px] object-contain sm:w-[188px]"/></Link>
-    <nav className="hidden flex-1 items-center justify-center gap-4 text-[12px] font-bold text-slate-700 xl:flex xl:gap-5 xl:text-[13px]">{nav.map(([label,href])=><Link key={label} href={href} className="transition hover:text-[#0b5cff]">{label}</Link>)}</nav>
+    <nav className="hidden flex-1 items-center justify-center gap-4 whitespace-nowrap text-[12px] font-bold text-slate-700 xl:flex xl:gap-5 xl:text-[13px]">{nav.map(([label,href])=><Link key={label} href={href} className="shrink-0 transition hover:text-[#0b5cff]">{label}</Link>)}</nav>
     <div className="ml-auto flex items-center gap-2">
       <div className="hidden h-11 w-56 items-center rounded-full border border-slate-200 bg-slate-50 px-4 2xl:flex"><Search size={17} className="text-slate-400"/><input aria-label="Search products" className="w-full bg-transparent px-2 text-sm outline-none" placeholder="Search products..."/></div>
       <Link href="/quote" className="hidden rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-800 transition hover:border-[#0b5cff] hover:text-[#0b5cff] lg:inline-flex">Request Quote</Link>
