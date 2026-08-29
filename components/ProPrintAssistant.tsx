@@ -8,6 +8,7 @@ type Reply = {
   text: string;
   href?: string;
   actionLabel?: string;
+  options?: string[];
 };
 
 type Message = {
@@ -67,6 +68,9 @@ function getReply(input: string, history: Message[] = []): Reply {
   const plotterMedia = /(media|paper|roll|roll feed|sheet feed|cutter|cutting|carriage|belt)/.test(context);
   const plotterPrinthead = /(printhead|print head|nozzle|ink system|maintenance cartridge)/.test(context);
 
+  const capacityMatch = text.match(/\b(500\s?gb|1\s?tb|2\s?tb)\b/i);
+  const capacitySelected = capacityMatch?.[1]?.replace(/\s+/g, '').toUpperCase();
+
   if (/(outside kuwait|saudi|dubai|uae|qatar|bahrain|oman|india|uk|international|overseas)/.test(text)) {
     return {
       text: 'This ProPrint website assistant is currently configured for Kuwait enquiries only. For requirements outside Kuwait, please contact ProPrint directly before assuming delivery or service coverage.',
@@ -91,19 +95,22 @@ function getReply(input: string, history: Message[] = []): Reply {
     };
   }
 
-  if (laptopContext && storageContext) {
-    const brandPhrase = knownComputerBrand ? ` in your ${knownComputerBrand.toUpperCase()} computer` : '';
-    if (priceQuestion) {
-      return {
-        text: `We can check the SSD or storage upgrade${brandPhrase}. The final price depends on the exact model, compatible drive and capacity, plus whether you need data transferred. Please give me the model and the capacity you want, such as 500GB, 1TB or 2TB.`,
-        href: '/service',
-        actionLabel: 'Request Storage Upgrade Quote',
-      };
-    }
+  if (capacitySelected && storageContext) {
+    const brandPhrase = knownComputerBrand ? ` for your ${knownComputerBrand.toUpperCase()} computer` : '';
     return {
-      text: `Yes, we can replace or upgrade the SSD${brandPhrase}. What is the exact model, and what capacity would you like — 500GB, 1TB or 2TB? If needed, we can also check whether your existing data can be transferred to the new drive.`,
+      text: `You selected ${capacitySelected}${brandPhrase}. I can prepare a price request for that SSD capacity. The final amount depends on the compatible SSD type for the exact model and current ProPrint/vendor price. Would you like ProPrint to check this ${capacitySelected} option?`,
       href: '/service',
-      actionLabel: 'Submit Storage Upgrade',
+      actionLabel: `Request ${capacitySelected} SSD Price`,
+    };
+  }
+
+  if (laptopContext && storageContext) {
+    const brandPhrase = knownComputerBrand ? ` for your ${knownComputerBrand.toUpperCase()} computer` : '';
+    return {
+      text: `Yes, we can replace or upgrade the SSD${brandPhrase}. Choose the capacity you want a price for:`,
+      options: ['500GB', '1TB', '2TB'],
+      href: '/service',
+      actionLabel: 'Open Storage Upgrade Request',
     };
   }
 
@@ -457,6 +464,15 @@ export function ProPrintAssistant() {
                 <div className={message.role === 'user' ? 'rounded-2xl rounded-br-md bg-[#0b5cff] px-4 py-3 text-sm leading-6 text-white' : 'rounded-2xl rounded-bl-md border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm'}>
                   {message.text}
                 </div>
+                {message.reply?.options && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {message.reply.options.map((option) => (
+                      <button key={option} onClick={() => ask(option)} className="rounded-full border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-black text-[#0b5cff] transition hover:border-[#0b5cff] hover:bg-blue-100">
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {message.reply?.href && (
                   <Link href={message.reply.href} onClick={() => setOpen(false)} className="mt-2 inline-flex items-center gap-1 rounded-full bg-white px-3 py-2 text-xs font-black text-[#0b5cff] shadow-sm ring-1 ring-slate-200">
                     {message.reply.actionLabel}<ChevronRight size={14} />
