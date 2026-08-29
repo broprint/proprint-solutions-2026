@@ -30,6 +30,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
   const params = await searchParams;
   const requested = params.service;
   const initialService: ServiceKey = requested === 'pickup' || requested === 'status' ? requested : 'warranty';
+  const directToForm = requested === 'pickup' || requested === 'status' || requested === 'warranty';
 
   return (
     <div className="bg-slate-50">
@@ -44,7 +45,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
         </div>
       </section>
 
-      <section className="py-16">
+      {!directToForm && <section className="py-16">
         <div className="container">
           <div className="mb-10 rounded-[2rem] border border-blue-100 bg-white p-6 shadow-sm sm:p-8">
             <div className="flex items-start gap-3">
@@ -67,7 +68,12 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
             </div>
             <p className="mt-5 text-xs leading-5 text-slate-500">External warranty results, regional eligibility and service terms are controlled by the respective manufacturer. A manufacturer link does not imply that ProPrint is an authorized warranty provider for that brand. If you need help identifying a product or arranging service available through ProPrint, submit a Warranty Support request below.</p>
           </div>
+        </div>
+      </section>}
 
+      <section id="customer-care-form" className={directToForm ? 'scroll-mt-6 py-8 sm:py-10' : 'scroll-mt-6 pb-16'}>
+        <div className="container">
+          {directToForm && <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-bold text-slate-700">You’re in the right place. Complete the selected {initialService === 'pickup' ? 'Pickup & Delivery' : initialService === 'status' ? 'Repair Status' : 'Warranty Support'} request below.</div>}
           <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
             <div className="space-y-4">
               {[
