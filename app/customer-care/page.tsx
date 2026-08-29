@@ -16,7 +16,14 @@ const warrantyLinks = [
   { brand: 'Epson', label: 'Epson Warranty Check', href: 'https://warrantycheck.epson.eu/', hint: 'Use the Epson serial number', support: 'ProPrint-supported brand' },
   { brand: 'Apple', label: 'Apple Coverage Check', href: 'https://checkcoverage.apple.com/?locale=en_KW', hint: 'Use the Apple device serial number', support: 'Official manufacturer portal' },
   { brand: 'Samsung', label: 'Samsung Warranty Information', href: 'https://www.samsung.com/ae/support/apps-services/how-to-check-my-warranty-information/', hint: 'Samsung account, IMEI or serial number may be required', support: 'Official manufacturer portal' },
-  { brand: 'Xiaomi', label: 'Xiaomi Warranty Information', href: 'https://www.mi.com/ae-en/support/warranty/', hint: 'Review official Xiaomi warranty terms and service information', support: 'Official manufacturer portal' },
+  { brand: 'Xiaomi', label: 'Xiaomi Warranty Information', href: 'https://www.mi.com/ae-en/support/warranty/', hint: 'Official Xiaomi warranty and service information', support: 'Official manufacturer portal' },
+  { brand: 'Acer', label: 'Acer Support', href: 'https://www.acer.com/ae-en/support', hint: 'Find product support, warranty and service resources', support: 'Official manufacturer portal' },
+  { brand: 'ASUS', label: 'ASUS Support', href: 'https://www.asus.com/me-en/support/', hint: 'Product support, warranty and repair resources', support: 'Official manufacturer portal' },
+  { brand: 'MSI', label: 'MSI Warranty & Support', href: 'https://www.msi.com/support', hint: 'Includes Warranty Status Inquiry and repair support', support: 'Official manufacturer portal' },
+  { brand: 'Canon', label: 'Canon Middle East Support', href: 'https://en.canon-me.com/support/', hint: 'Product support and service resources for Canon equipment', support: 'Official manufacturer portal' },
+  { brand: 'Brother', label: 'Brother Gulf Support', href: 'https://www.brother.ae/en/support', hint: 'Product registration, warranty terms and service support', support: 'Official manufacturer portal' },
+  { brand: 'Huawei', label: 'Huawei Kuwait Warranty Check', href: 'https://consumer.huawei.com/kw-en/support/warranty-query/', hint: 'Enter the device serial number to query warranty and support service', support: 'Official Kuwait manufacturer portal' },
+  { brand: 'Microsoft Surface', label: 'Microsoft Warranty & Service', href: 'https://support.microsoft.com/en-US/accounts-billing/manage/check-your-microsoft-warranty-and-create-service-orders', hint: 'Register or select your Surface device to view warranty coverage', support: 'Official manufacturer portal' },
 ];
 
 export default async function CustomerCarePage({ searchParams }: { searchParams: Promise<{ service?: string }> }) {
@@ -45,7 +52,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
               <div>
                 <div className="text-[11px] font-black uppercase tracking-[.18em] text-[#0b5cff]">Official Manufacturer Portals</div>
                 <h2 className="mt-2 text-2xl font-black tracking-[-.03em]">Check your device warranty</h2>
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Select your brand to open its official warranty/support website in a new tab. We include useful manufacturer portals even where ProPrint does not currently provide authorized warranty service.</p>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">Select your brand to open its official warranty or support website in a new tab. These links are provided as a customer convenience and include manufacturers beyond ProPrint's current supported brands.</p>
               </div>
             </div>
             <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -58,7 +65,7 @@ export default async function CustomerCarePage({ searchParams }: { searchParams:
                 </a>
               ))}
             </div>
-            <p className="mt-5 text-xs leading-5 text-slate-500">External warranty results and service eligibility are provided by the respective manufacturer. A manufacturer link does not imply that ProPrint is an authorized warranty provider for that brand. If you need help identifying the product or arranging available service, submit a ProPrint Warranty Support request below.</p>
+            <p className="mt-5 text-xs leading-5 text-slate-500">External warranty results, regional eligibility and service terms are controlled by the respective manufacturer. A manufacturer link does not imply that ProPrint is an authorized warranty provider for that brand. If you need help identifying a product or arranging service available through ProPrint, submit a Warranty Support request below.</p>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[.75fr_1.25fr]">
