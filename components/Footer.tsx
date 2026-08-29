@@ -7,7 +7,7 @@ export function Footer(){return <footer className="bg-[#061321] text-white">
       <div className="flex gap-3"><MapPin className="mt-0.5 shrink-0 text-[#57a7ff]" size={18}/><div><b className="text-sm">Service Center</b><p className="mt-1 text-xs leading-5 text-slate-400">Galleria Building 57, behind Lulu, Mezzanine Office No. 1, Gate #3, Al-Dajeej 13095, Kuwait</p></div></div>
       <div className="flex gap-3"><Phone className="mt-0.5 shrink-0 text-[#57a7ff]" size={18}/><div><b className="text-sm">Call ProPrint</b><p className="mt-1 text-xs leading-5 text-slate-400">+965 24333201</p></div></div>
       <div className="flex gap-3"><Mail className="mt-0.5 shrink-0 text-[#57a7ff]" size={18}/><div><b className="text-sm">Email Support</b><p className="mt-1 text-xs leading-5 text-slate-400">support@proprintsolutions.net</p></div></div>
-      <div className="flex gap-3"><Clock3 className="mt-0.5 shrink-0 text-[#57a7ff]" size={18}/><div><b className="text-sm">Working Hours</b><p className="mt-1 text-xs leading-5 text-slate-400">Sunday–Thursday: 8:00 AM–5:00 PM<br/>Saturday: 8:00 AM–2:00 PM<br/>Friday: Closed</p></div></div>
+      <div className="flex gap-3"><Clock3 className="mt-0.5 shrink-0 text-[#57a7ff]" size={18}/><div><b className="text-sm">Working Hours</b><p className="mt-1 text-xs leading-5 text-slate-400">Sunday–Thursday: 8:00 AM–5:00 PM<br/>Saturday: 8:00 AM–1:00 PM<br/>Friday: Closed</p></div></div>
     </div>
   </div>
 
