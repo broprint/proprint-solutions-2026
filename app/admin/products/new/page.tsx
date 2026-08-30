@@ -2,11 +2,11 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft, ImagePlus, PackagePlus, ShieldCheck } from 'lucide-react';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { PRODUCT_CATEGORIES } from '@/config/catalog';
 import { createProduct } from '../actions';
 
 const fieldClass = 'mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#0b5cff]';
 const labelClass = 'text-xs font-black uppercase tracking-wider text-slate-600';
-const productCategories = ['Computers', 'Printers & MFPs', 'Plotters & Wide Format', 'Networking', 'Servers & Storage', 'Accessories'];
 
 export default async function NewProductPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
   const supabase = await createSupabaseServerClient();
@@ -27,7 +27,7 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
         <div><label className={labelClass}>Product Name *</label><input name="name" required className={fieldClass} placeholder="HP LaserJet Pro MFP 4103fdw"/></div>
         <div><label className={labelClass}>Slug *</label><input name="slug" required pattern="[a-z0-9-]+" className={fieldClass} placeholder="hp-laserjet-pro-mfp-4103fdw"/><p className="mt-1 text-xs text-slate-500">Lowercase letters, numbers and hyphens only.</p></div>
         <div><label className={labelClass}>Brand *</label><input name="brand" required className={fieldClass} placeholder="HP"/></div>
-        <div><label className={labelClass}>Category *</label><select name="category" required defaultValue="" className={fieldClass}><option value="" disabled>Select product category</option>{productCategories.map(category=><option key={category} value={category}>{category}</option>)}</select></div>
+        <div><label className={labelClass}>Category *</label><select name="category" required defaultValue="" className={fieldClass}><option value="" disabled>Select product category</option>{PRODUCT_CATEGORIES.map(category=><option key={category} value={category}>{category}</option>)}</select></div>
         <div><label className={labelClass}>SKU</label><input name="sku" className={fieldClass} placeholder="HP-4103FDW"/></div><div><label className={labelClass}>Badge</label><input name="badge" className={fieldClass} placeholder="New / Bestseller / Offer"/></div>
       </div></section>
       <section className="rounded-[2rem] border border-slate-200 bg-white p-6 md:p-8"><h2 className="text-lg font-black text-slate-900">Price & Availability</h2><div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-3"><div><label className={labelClass}>Selling Price (KD)</label><input name="price" type="number" min="0" step="0.001" className={fieldClass} placeholder="129.000"/></div><div><label className={labelClass}>Old Price (KD)</label><input name="old_price" type="number" min="0" step="0.001" className={fieldClass} placeholder="149.000"/></div><div><label className={labelClass}>Stock Quantity</label><input name="stock_quantity" type="number" min="0" step="1" defaultValue="0" className={fieldClass}/></div><div className="md:col-span-2"><label className={labelClass}>Availability</label><select name="availability" defaultValue="request_availability" className={fieldClass}><option value="in_stock">In Stock</option><option value="low_stock">Low Stock</option><option value="available_on_order">Available on Order</option><option value="request_availability">Request Availability</option><option value="out_of_stock">Out of Stock</option><option value="quote_only">Quote Only</option></select></div><label className="flex items-center gap-3 self-end rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700"><input name="price_on_request" type="checkbox" className="h-4 w-4"/> Price on request</label></div></section>
