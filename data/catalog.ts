@@ -13,6 +13,8 @@ export type Product = {
   imageAlt?: string;
   sku?: string;
   stock?: 'In stock' | 'Low stock' | 'Available on order' | 'Request availability' | 'Out of stock' | 'Quote only';
+  stockQuantity?: number;
+  priceOnRequest?: boolean;
 };
 
 // Product photos are intentionally optional. When a verified manufacturer/product
