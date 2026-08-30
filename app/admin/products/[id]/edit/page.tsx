@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, ShieldCheck } from 'lucide-react';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { updateProduct } from '../../../actions';
+import { updateProduct } from '@/app/admin/products/actions';
 
 const field='mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#0b5cff]';
 const label='text-xs font-black uppercase tracking-wider text-slate-600';
