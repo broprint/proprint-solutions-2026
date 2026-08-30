@@ -4,7 +4,8 @@ import { Boxes, LogOut, Plus, ShieldCheck } from 'lucide-react';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { DatabaseProduct } from '@/lib/products';
 import { logout } from '../login/actions';
-import { deleteProduct, setProductPublished } from './actions';
+import { setProductPublished } from './actions';
+import DeleteProductButton from './DeleteProductButton';
 
 function priceLabel(product: DatabaseProduct) {
   if (product.price_on_request || product.price === null) return 'Request Quote';
@@ -50,7 +51,7 @@ export default async function AdminProductsPage({ searchParams }: { searchParams
         {products.map(product=><tr key={product.id}><td className="px-6 py-5"><div className="font-black text-slate-900">{product.name}</div><div className="mt-1 text-xs text-slate-500">{product.brand} · {product.category}</div></td><td className="px-4 py-5 text-slate-600">{product.sku ?? '—'}</td><td className="px-4 py-5 font-bold text-slate-900">{priceLabel(product)}</td><td className="px-4 py-5"><div className="font-bold text-slate-700">{product.stock_quantity}</div><div className="text-xs text-slate-500">{availabilityLabel(product.availability)}</div></td><td className="px-4 py-5"><span className={`inline-flex rounded-full px-3 py-1 text-xs font-black ${product.published?'bg-emerald-50 text-emerald-700':'bg-slate-100 text-slate-600'}`}>{product.published?'Published':'Draft'}</span></td><td className="px-6 py-5"><div className="flex flex-wrap justify-end gap-2">
           <form action={setProductPublished}><input type="hidden" name="product_id" value={product.id}/><input type="hidden" name="published" value={product.published?'false':'true'}/><button type="submit" className={`rounded-full px-4 py-2 text-xs font-black text-white ${product.published?'bg-slate-600 hover:bg-slate-700':'bg-emerald-600 hover:bg-emerald-700'}`}>{product.published?'Move to Draft':'Publish'}</button></form>
           <Link href={`/admin/products/${product.id}/edit`} className="inline-flex rounded-full border border-slate-200 px-4 py-2 text-xs font-black text-slate-700 hover:border-[#0b5cff] hover:text-[#0b5cff]">Edit Product</Link>
-          <form action={deleteProduct}><input type="hidden" name="product_id" value={product.id}/><button type="submit" className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-black text-red-700 hover:bg-red-100">Delete Product</button></form>
+          <DeleteProductButton productId={product.id} productName={product.name} />
         </div></td></tr>)}
       </tbody></table></div>}
     </section>
