@@ -9,6 +9,35 @@ export const PRODUCT_CATEGORIES = [
 
 export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number];
 
+const CATEGORY_ALIASES: Record<string, ProductCategory> = {
+  laptops: 'Computers',
+  laptop: 'Computers',
+  computers: 'Computers',
+  computer: 'Computers',
+  pcs: 'Computers',
+  'laptops & pcs': 'Computers',
+  printers: 'Printers & MFPs',
+  printer: 'Printers & MFPs',
+  'printers & mfps': 'Printers & MFPs',
+  mfps: 'Printers & MFPs',
+  plotters: 'Plotters & Wide Format',
+  plotter: 'Plotters & Wide Format',
+  'plotters & wide format': 'Plotters & Wide Format',
+  networking: 'Networking',
+  network: 'Networking',
+  storage: 'Servers & Storage',
+  servers: 'Servers & Storage',
+  'servers & storage': 'Servers & Storage',
+  accessories: 'Accessories',
+  accessory: 'Accessories',
+  'it accessories': 'Accessories',
+};
+
+export function normalizeProductCategory(category: string): string {
+  const trimmed = category.trim();
+  return CATEGORY_ALIASES[trimmed.toLowerCase()] ?? trimmed;
+}
+
 // Maps the public homepage category cards to the canonical category values
 // stored by the admin catalog. Keeping this in one place makes the catalog
 // easier to reuse for future white-label deployments.
