@@ -15,6 +15,7 @@ export function ProductCard({ product }: { product:Product }) {
     : product.stock === 'Low stock' || product.stock === 'Available on order'
       ? 'text-amber-600'
       : 'text-emerald-600';
+  const needsEnquiry = quoteOnly || product.stock === 'Request availability' || product.stock === 'Out of stock';
 
   return <article className="group overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
     <div className="relative">
@@ -30,7 +31,8 @@ export function ProductCard({ product }: { product:Product }) {
       <div className="mt-5"><div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{quoteOnly?'Business pricing':'Price'}</div><b className="mt-1 block text-lg">{product.price}</b></div>
       <div className="mt-4 flex flex-wrap gap-2">
         {canBuy && <ShopAddToCartButton product={product}/>} 
-        <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex items-center rounded-full bg-[#0b5cff] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">{quoteOnly ? 'Request Price' : product.stock === 'Request availability' || product.stock === 'Out of stock' ? 'Check Availability' : 'View Details'} <ArrowRight className="ml-1" size={13}/></Link>
+        {needsEnquiry && <Link href={`/products/${product.slug}`} className="inline-flex items-center rounded-full border border-[#0b5cff] bg-white px-4 py-2.5 text-xs font-black text-[#0b5cff] transition hover:bg-blue-50">{quoteOnly ? 'Request Price' : 'Check Availability'} <ArrowRight className="ml-1" size={13}/></Link>}
+        <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex items-center rounded-full bg-[#0b5cff] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">View Details <ArrowRight className="ml-1" size={13}/></Link>
       </div>
     </div>
   </article>;
