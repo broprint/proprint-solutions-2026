@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import type { Product } from '@/data/catalog';
+import { normalizeProductCategory } from '@/config/catalog';
 
 export type DatabaseProduct = {
   id: string;
@@ -83,17 +84,18 @@ export function toStoreProduct(product: DatabaseProduct): Product {
       : [];
 
   const quoteOnly = product.price_on_request || product.price === null;
+  const category = normalizeProductCategory(product.category);
 
   return {
     slug: product.slug,
     name: product.name,
     brand: product.brand,
-    category: product.category,
+    category,
     price: quoteOnly ? 'Request Quote' : `KD ${Number(product.price).toFixed(3)}`,
     oldPrice: product.old_price === null ? undefined : `KD ${Number(product.old_price).toFixed(3)}`,
     badge: product.badge ?? undefined,
     specs,
-    icon: productIcon(product.category),
+    icon: productIcon(category),
     image: primaryImage,
     images,
     imageAlt: product.image_alt ?? product.name,
