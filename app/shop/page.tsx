@@ -10,8 +10,10 @@ const trustItems = [
   [Building2, 'Business procurement', 'Bulk quotes, deployment and AMC'],
 ] as const;
 
-export default async function ShopPage() {
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
   const products = await getStoreProducts();
+  const params = await searchParams;
+  const initialCategory = params.category?.trim() || 'All';
 
   return (
     <main>
@@ -40,7 +42,7 @@ export default async function ShopPage() {
         </div>
       </section>
 
-      <div id="catalog"><ShopCatalog products={products}/></div>
+      <div id="catalog"><ShopCatalog products={products} initialCategory={initialCategory}/></div>
 
       <section className="pb-20">
         <div className="container grid gap-5 lg:grid-cols-2">
