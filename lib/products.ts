@@ -27,6 +27,7 @@ export type DatabaseProduct = {
     | 'quote_only';
 
   image_url: string | null;
+  image_urls: string[];
   image_alt: string | null;
 
   badge: string | null;
@@ -70,6 +71,17 @@ export function toStoreProduct(product: DatabaseProduct): Product {
     ? product.specifications.filter((item): item is string => typeof item === 'string')
     : [];
 
+  const gallery = Array.isArray(product.image_urls)
+    ? product.image_urls.filter((item): item is string => typeof item === 'string' && item.length > 0)
+    : [];
+
+  const primaryImage = product.image_url ?? gallery[0] ?? undefined;
+  const images = gallery.length > 0
+    ? gallery
+    : primaryImage
+      ? [primaryImage]
+      : [];
+
   const quoteOnly = product.price_on_request || product.price === null;
 
   return {
@@ -82,7 +94,8 @@ export function toStoreProduct(product: DatabaseProduct): Product {
     badge: product.badge ?? undefined,
     specs,
     icon: productIcon(product.category),
-    image: product.image_url ?? undefined,
+    image: primaryImage,
+    images,
     imageAlt: product.image_alt ?? product.name,
     sku: product.sku ?? undefined,
     stock: stockLabel(product),
