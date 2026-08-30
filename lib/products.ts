@@ -99,6 +99,8 @@ export function toStoreProduct(product: DatabaseProduct): Product {
     imageAlt: product.image_alt ?? product.name,
     sku: product.sku ?? undefined,
     stock: stockLabel(product),
+    stockQuantity: product.stock_quantity,
+    priceOnRequest: quoteOnly,
   };
 }
 
