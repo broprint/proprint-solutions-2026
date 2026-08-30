@@ -13,12 +13,28 @@ const slides = [
     imageAlt: 'HP business multifunction printer',
   },
   {
+    title: 'Large-Format Printing Made Simple',
+    text: 'Professional plotters for CAD drawings, technical plans, posters and large-format business printing.',
+    href: '/shop?category=Plotters%20%26%20Wide%20Format',
+    cta: 'Shop Plotters',
+    image: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Plotter%20%28HP%29%20%2815427738336%29.jpg',
+    imageAlt: 'HP large-format plotter',
+  },
+  {
     title: 'Powerful Technology Built for Success',
     text: 'Business laptops designed for performance, mobility and everyday reliability.',
     href: '/shop?category=Computers',
     cta: 'Shop Computers',
     image: 'https://kr-media.apjonlinecdn.com/catalog/product/B/9/B94E9PT-11_T1739342255.png',
     imageAlt: 'HP business laptop',
+  },
+  {
+    title: 'Connect Every Part of Your Business',
+    text: 'Switching, routing and network infrastructure for fast, secure and dependable connectivity.',
+    href: '/shop?category=Networking',
+    cta: 'Shop Networking',
+    image: 'https://commons.wikimedia.org/wiki/Special:Redirect/file/Cisco%20Catalyst%204506-E%20Switch%20001.jpg',
+    imageAlt: 'Cisco Catalyst enterprise network switch',
   },
   {
     title: 'Stronger Infrastructure for Your Business',
