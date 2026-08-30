@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 const PRODUCT_IMAGE_BUCKET = 'product-images';
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_PRODUCT_IMAGES = 5;
 const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
 function optionalText(value: FormDataEntryValue | null) {
@@ -61,29 +62,34 @@ export async function createProduct(formData: FormData) {
   const priceOnRequest = formData.get('price_on_request') === 'on';
   const price = priceOnRequest ? null : optionalNumber(formData.get('price'));
 
-  let uploadedImagePath: string | null = null;
-  let imageUrl = optionalText(formData.get('image_url'));
-  const imageFile = formData.get('image_file');
+  const imageFiles = formData
+    .getAll('image_files')
+    .filter((item): item is File => item instanceof File && item.size > 0);
 
-  if (imageFile instanceof File && imageFile.size > 0) {
+  if (imageFiles.length > MAX_PRODUCT_IMAGES) {
+    redirect('/admin/products/new?error=image-count');
+  }
+
+  for (const imageFile of imageFiles) {
     if (!ALLOWED_IMAGE_TYPES.has(imageFile.type)) {
       redirect('/admin/products/new?error=image-type');
     }
-
     if (imageFile.size > MAX_IMAGE_SIZE) {
       redirect('/admin/products/new?error=image-size');
     }
+  }
 
+  const uploadedImagePaths: string[] = [];
+  const uploadedImageUrls: string[] = [];
+
+  for (const imageFile of imageFiles) {
     const extension = imageExtension(imageFile);
-    if (!extension) {
-      redirect('/admin/products/new?error=image-type');
-    }
+    if (!extension) redirect('/admin/products/new?error=image-type');
 
-    uploadedImagePath = `${slug}/${crypto.randomUUID()}.${extension}`;
-
+    const imagePath = `${slug}/${crypto.randomUUID()}.${extension}`;
     const { error: uploadError } = await supabase.storage
       .from(PRODUCT_IMAGE_BUCKET)
-      .upload(uploadedImagePath, imageFile, {
+      .upload(imagePath, imageFile, {
         contentType: imageFile.type,
         cacheControl: '3600',
         upsert: false,
@@ -91,15 +97,27 @@ export async function createProduct(formData: FormData) {
 
     if (uploadError) {
       console.error('Failed to upload product image:', uploadError);
+      if (uploadedImagePaths.length > 0) {
+        await supabase.storage.from(PRODUCT_IMAGE_BUCKET).remove(uploadedImagePaths);
+      }
       redirect('/admin/products/new?error=image-upload');
     }
 
+    uploadedImagePaths.push(imagePath);
     const { data: publicImage } = supabase.storage
       .from(PRODUCT_IMAGE_BUCKET)
-      .getPublicUrl(uploadedImagePath);
-
-    imageUrl = publicImage.publicUrl;
+      .getPublicUrl(imagePath);
+    uploadedImageUrls.push(publicImage.publicUrl);
   }
+
+  const externalImageUrl = optionalText(formData.get('image_url'));
+  const galleryUrls = uploadedImageUrls.length > 0
+    ? uploadedImageUrls
+    : externalImageUrl
+      ? [externalImageUrl]
+      : [];
+
+  const primaryImageUrl = galleryUrls[0] ?? null;
 
   const { error } = await supabase.from('products').insert({
     name,
@@ -115,7 +133,8 @@ export async function createProduct(formData: FormData) {
     price_on_request: priceOnRequest,
     stock_quantity: Math.max(0, Number(formData.get('stock_quantity') ?? 0) || 0),
     availability: String(formData.get('availability') ?? 'request_availability'),
-    image_url: imageUrl,
+    image_url: primaryImageUrl,
+    image_urls: galleryUrls,
     image_alt: optionalText(formData.get('image_alt')) || name,
     badge: optionalText(formData.get('badge')),
     featured: formData.get('featured') === 'on',
@@ -124,13 +143,13 @@ export async function createProduct(formData: FormData) {
   });
 
   if (error) {
-    if (uploadedImagePath) {
+    if (uploadedImagePaths.length > 0) {
       const { error: cleanupError } = await supabase.storage
         .from(PRODUCT_IMAGE_BUCKET)
-        .remove([uploadedImagePath]);
+        .remove(uploadedImagePaths);
 
       if (cleanupError) {
-        console.error('Failed to clean up uploaded product image:', cleanupError);
+        console.error('Failed to clean up uploaded product images:', cleanupError);
       }
     }
 
