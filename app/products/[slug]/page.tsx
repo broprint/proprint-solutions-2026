@@ -11,8 +11,14 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
   const products=await getStoreProducts();
   const product=products.find(p=>p.slug===slug);
   if(!product)notFound();
-  const quoteOnly=product.price.toLowerCase().includes('quote');
-  const unavailable=product.stock==='Out of stock' || product.stock==='Request availability' || product.stock==='Available on order';
+
+  const quoteOnly=product.priceOnRequest || product.stock==='Quote only';
+  const inStock=(product.stock==='In stock' || product.stock==='Low stock') && (product.stockQuantity??0)>0;
+  const orderable=product.stock==='Available on order';
+  const canAddToCart=!quoteOnly && (inStock || orderable);
+  const requestAvailability=product.stock==='Request availability';
+  const outOfStock=product.stock==='Out of stock' || ((product.stock==='In stock' || product.stock==='Low stock') && (product.stockQuantity??0)<=0);
+  const inquiryLabel=quoteOnly ? 'Request Price' : requestAvailability ? 'Check Availability' : outOfStock ? 'Check Availability' : 'Request Business Quote';
   const related=products.filter(p=>p.slug!==product.slug && (p.category===product.category || p.brand===product.brand)).slice(0,3);
 
   return <main>
@@ -27,11 +33,13 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
         <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600">Business-ready technology supplied with access to ProPrint installation, configuration and after-sales support in Kuwait.</p>
         <div className="mt-6 flex flex-wrap items-end gap-3"><div className="text-3xl font-black">{product.price}</div></div>
         {product.sku && <div className="mt-2 text-[10px] font-bold uppercase tracking-wider text-slate-400">Reference SKU: {product.sku}</div>}
-        {product.stock && <div className="mt-3 text-sm font-black text-slate-600">Availability: {product.stock}</div>}
+        {product.stock && <div className="mt-3 text-sm font-black text-slate-600">Availability: {product.stock}{inStock && product.stockQuantity!==undefined ? ` · ${product.stockQuantity} available` : ''}</div>}
+        {orderable && <div className="mt-3 rounded-xl bg-amber-50 px-4 py-3 text-sm font-bold text-amber-800">Available on order. ProPrint will confirm the expected delivery time with you.</div>}
+        {outOfStock && <div className="mt-3 rounded-xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">Currently out of stock. Contact ProPrint to check the next availability.</div>}
 
         <div className="mt-7 grid gap-3 sm:grid-cols-2">{product.specs.map(x=><div key={x} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold"><CheckCircle2 size={17} className="text-[#0b5cff]"/>{x}</div>)}</div>
 
-        <div className="mt-8 flex flex-wrap gap-3">{!quoteOnly && !unavailable && <AddToCartButton product={product}/>}<Link href="/quote" className="rounded-full bg-[#061321] px-6 py-3.5 font-black text-white">{quoteOnly || unavailable ? 'Request Price / Availability' : 'Request Business Quote'}</Link></div>
+        <div className="mt-8 flex flex-wrap gap-3">{canAddToCart && <AddToCartButton product={product}/>}<Link href="/quote" className="rounded-full bg-[#061321] px-6 py-3.5 font-black text-white">{inquiryLabel}</Link></div>
 
         <div className="mt-8 grid grid-cols-2 gap-3 text-xs font-bold text-slate-600 sm:grid-cols-4">
           <div className="rounded-xl bg-slate-100 p-3"><Truck size={17} className="mb-2 text-[#0b5cff]"/>Kuwait delivery</div>
