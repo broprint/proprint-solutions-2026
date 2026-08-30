@@ -6,18 +6,29 @@ import { login } from './actions';
 export default async function AdminLoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; status?: string }>;
 }) {
   const supabase = await createSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (user) redirect('/admin/products');
+  if (user) {
+    const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+    if (!adminError && isAdmin) redirect('/admin/products');
+    await supabase.auth.signOut();
+  }
 
-  const { error } = await searchParams;
+  const { error, status } = await searchParams;
   const message = error === 'invalid'
     ? 'The email or password is incorrect.'
     : error === 'missing'
       ? 'Enter both your email and password.'
-      : null;
+      : error === 'unauthorized'
+        ? 'This account signed in successfully, but it is not approved for ProPrint catalog administration.'
+        : status === 'signedout'
+          ? 'You have been signed out successfully.'
+          : null;
+  const messageClass = status === 'signedout'
+    ? 'bg-emerald-50 text-emerald-700'
+    : 'bg-red-50 text-red-700';
 
   return (
     <main className="min-h-[75vh] bg-slate-50 py-16">
@@ -30,7 +41,7 @@ export default async function AdminLoginPage({
           <h1 className="mt-2 text-3xl font-black tracking-[-.04em] text-slate-900">Admin Login</h1>
           <p className="mt-3 text-sm leading-6 text-slate-600">Sign in with an approved ProPrint administrator account to manage the product catalog.</p>
 
-          {message && <div className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{message}</div>}
+          {message && <div className={`mt-5 rounded-xl px-4 py-3 text-sm font-bold ${messageClass}`}>{message}</div>}
 
           <form action={login} className="mt-7 space-y-5">
             <div>
