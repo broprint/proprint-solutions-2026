@@ -18,11 +18,17 @@ export async function login(formData: FormData) {
     redirect('/admin/login?error=invalid');
   }
 
+  const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+  if (adminError || !isAdmin) {
+    await supabase.auth.signOut();
+    redirect('/admin/login?error=unauthorized');
+  }
+
   redirect('/admin/products');
 }
 
 export async function logout() {
   const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
-  redirect('/admin/login');
+  redirect('/admin/login?status=signedout');
 }
