@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CheckCircle2, ChevronRight, Headphones, ShieldCheck, Truck, Wrench } from 'lucide-react';
-import { ProductVisual } from '@/components/ProductVisual';
+import { ProductGallery } from '@/components/ProductGallery';
 import { ProductCard } from '@/components/ProductCard';
 import { AddToCartButton } from '@/components/AddToCartButton';
 import { getStoreProducts } from '@/lib/products';
@@ -19,7 +19,7 @@ export default async function ProductPage({params}:{params:Promise<{slug:string}
     <section className="border-b bg-white py-5"><div className="container flex flex-wrap items-center gap-2 text-xs font-bold text-slate-500"><Link href="/shop" className="hover:text-[#0b5cff]">Shop</Link><ChevronRight size={13}/><span>{product.category}</span><ChevronRight size={13}/><span className="text-slate-900">{product.name}</span></div></section>
 
     <section className="py-12"><div className="container"><div className="grid gap-10 lg:grid-cols-[1.05fr_.95fr]">
-      <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm"><ProductVisual icon={product.icon} image={product.image} imageAlt={product.imageAlt || product.name}/></div>
+      <ProductGallery product={product}/>
       <div>
         {product.badge && <span className="inline-flex rounded-full bg-blue-50 px-3 py-1.5 text-[10px] font-black tracking-widest text-[#0b5cff]">{product.badge}</span>}
         <div className="mt-4 text-[11px] font-black uppercase tracking-[.16em] text-[#0b5cff]">{product.brand} • {product.category}</div>
