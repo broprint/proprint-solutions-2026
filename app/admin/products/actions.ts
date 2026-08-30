@@ -3,6 +3,10 @@
 import { redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
+const PRODUCT_IMAGE_BUCKET = 'product-images';
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
 function optionalText(value: FormDataEntryValue | null) {
   const text = String(value ?? '').trim();
   return text || null;
@@ -13,6 +17,19 @@ function optionalNumber(value: FormDataEntryValue | null) {
   if (!text) return null;
   const number = Number(text);
   return Number.isFinite(number) ? number : null;
+}
+
+function imageExtension(file: File) {
+  switch (file.type) {
+    case 'image/jpeg':
+      return 'jpg';
+    case 'image/png':
+      return 'png';
+    case 'image/webp':
+      return 'webp';
+    default:
+      return null;
+  }
 }
 
 export async function createProduct(formData: FormData) {
@@ -32,6 +49,10 @@ export async function createProduct(formData: FormData) {
     redirect('/admin/products/new?error=required');
   }
 
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    redirect('/admin/products/new?error=slug');
+  }
+
   const specifications = String(formData.get('specifications') ?? '')
     .split('\n')
     .map((item) => item.trim())
@@ -39,6 +60,46 @@ export async function createProduct(formData: FormData) {
 
   const priceOnRequest = formData.get('price_on_request') === 'on';
   const price = priceOnRequest ? null : optionalNumber(formData.get('price'));
+
+  let uploadedImagePath: string | null = null;
+  let imageUrl = optionalText(formData.get('image_url'));
+  const imageFile = formData.get('image_file');
+
+  if (imageFile instanceof File && imageFile.size > 0) {
+    if (!ALLOWED_IMAGE_TYPES.has(imageFile.type)) {
+      redirect('/admin/products/new?error=image-type');
+    }
+
+    if (imageFile.size > MAX_IMAGE_SIZE) {
+      redirect('/admin/products/new?error=image-size');
+    }
+
+    const extension = imageExtension(imageFile);
+    if (!extension) {
+      redirect('/admin/products/new?error=image-type');
+    }
+
+    uploadedImagePath = `${slug}/${crypto.randomUUID()}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .upload(uploadedImagePath, imageFile, {
+        contentType: imageFile.type,
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error('Failed to upload product image:', uploadError);
+      redirect('/admin/products/new?error=image-upload');
+    }
+
+    const { data: publicImage } = supabase.storage
+      .from(PRODUCT_IMAGE_BUCKET)
+      .getPublicUrl(uploadedImagePath);
+
+    imageUrl = publicImage.publicUrl;
+  }
 
   const { error } = await supabase.from('products').insert({
     name,
@@ -54,7 +115,7 @@ export async function createProduct(formData: FormData) {
     price_on_request: priceOnRequest,
     stock_quantity: Math.max(0, Number(formData.get('stock_quantity') ?? 0) || 0),
     availability: String(formData.get('availability') ?? 'request_availability'),
-    image_url: optionalText(formData.get('image_url')),
+    image_url: imageUrl,
     image_alt: optionalText(formData.get('image_alt')) || name,
     badge: optionalText(formData.get('badge')),
     featured: formData.get('featured') === 'on',
@@ -63,6 +124,16 @@ export async function createProduct(formData: FormData) {
   });
 
   if (error) {
+    if (uploadedImagePath) {
+      const { error: cleanupError } = await supabase.storage
+        .from(PRODUCT_IMAGE_BUCKET)
+        .remove([uploadedImagePath]);
+
+      if (cleanupError) {
+        console.error('Failed to clean up uploaded product image:', cleanupError);
+      }
+    }
+
     console.error('Failed to create product:', error);
     const reason = error.code === '23505' ? 'duplicate' : 'save';
     redirect(`/admin/products/new?error=${reason}`);
