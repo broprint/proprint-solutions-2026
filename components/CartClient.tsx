@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowRight, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Minus, Plus, ShoppingCart, Trash2 } from 'lucide-react';
 import { ProductVisual } from '@/components/ProductVisual';
 import type { Product } from '@/data/catalog';
 
@@ -76,7 +76,12 @@ export function CartClient({ products }:{ products:Product[] }){
     <ShoppingCart className="text-[#0b5cff]" size={34}/><h2 className="mt-4 text-2xl font-black">Your cart is empty</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Add products from the shop to see them here. This cart persists on this device until you clear it.</p><Link href="/shop" className="mt-7 inline-flex items-center rounded-full bg-[#061321] px-6 py-3 font-black text-white">Continue Shopping <ArrowRight className="ml-2" size={16}/></Link>
   </div>;
 
-  return <div className="space-y-4">{lines.map(({item,product})=>{
+  return <div className="space-y-4">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <Link href="/shop" className="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 shadow-sm transition hover:border-[#0b5cff] hover:text-[#0b5cff]"><ArrowLeft className="mr-2" size={16}/>Continue Shopping</Link>
+      <span className="text-xs font-bold text-slate-500">Your cart is saved while you browse.</span>
+    </div>
+    {lines.map(({item,product})=>{
     const unit=parsePrice(product.price);
     const max=maxQuantity(product);
     const atLimit=max!==null&&item.quantity>=max;
@@ -86,5 +91,6 @@ export function CartClient({ products }:{ products:Product[] }){
       <div className="flex items-center justify-between gap-4 sm:block sm:text-right"><div className="font-black">{unit!==null?`KD ${(unit*item.quantity).toFixed(3)}`:'Quote'}</div><button onClick={()=>remove(product.slug)} className="mt-3 inline-flex items-center gap-1 text-xs font-black text-red-600"><Trash2 size={14}/>Remove</button></div>
     </div>})}
     <div className="rounded-[1.5rem] bg-slate-100 p-6"><div className="flex items-center justify-between text-sm text-slate-500"><span>Indicative subtotal</span><span className="text-xl font-black text-slate-900">KD {subtotal.toFixed(3)}</span></div>{hasQuoteOnly&&<p className="mt-2 text-xs text-slate-500">Quote-only products are not included in the numeric subtotal.</p>}</div>
+    <div className="pt-1"><Link href="/shop" className="inline-flex items-center rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-black text-slate-800 transition hover:border-[#0b5cff] hover:text-[#0b5cff]"><ArrowLeft className="mr-2" size={16}/>Continue Shopping</Link></div>
   </div>;
 }
