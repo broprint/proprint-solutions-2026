@@ -1,7 +1,8 @@
 import Link from 'next/link';
-import { ArrowRight, CheckCircle2, PackageCheck, ShieldCheck, ShoppingCart } from 'lucide-react';
+import { ArrowRight, CheckCircle2, PackageCheck, ShieldCheck } from 'lucide-react';
 import type { Product } from '@/data/catalog';
 import { ProductVisual } from './ProductVisual';
+import { ShopAddToCartButton } from './ShopAddToCartButton';
 
 export function ProductCard({ product }: { product:Product }) {
   const quoteOnly = product.priceOnRequest || product.stock === 'Quote only' || product.price.toLowerCase().includes('quote');
@@ -28,7 +29,7 @@ export function ProductCard({ product }: { product:Product }) {
       <div className="mt-4 flex flex-wrap gap-2 text-[10px] font-bold text-slate-500"><span className="rounded-full bg-slate-100 px-2.5 py-1"><ShieldCheck className="mr-1 inline" size={11}/>Support</span><span className="rounded-full bg-slate-100 px-2.5 py-1"><PackageCheck className="mr-1 inline" size={11}/>Delivery</span></div>
       <div className="mt-5"><div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{quoteOnly?'Business pricing':'Price'}</div><b className="mt-1 block text-lg">{product.price}</b></div>
       <div className="mt-4 flex flex-wrap gap-2">
-        {canBuy && <Link href={`/products/${product.slug}`} aria-label={`Buy ${product.name}`} className="inline-flex items-center rounded-full bg-[#f47b20] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#dc6815]"><ShoppingCart className="mr-1.5" size={14}/>Add to Cart</Link>}
+        {canBuy && <ShopAddToCartButton product={product}/>} 
         <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex items-center rounded-full bg-[#0b5cff] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">{quoteOnly ? 'Request Price' : product.stock === 'Request availability' || product.stock === 'Out of stock' ? 'Check Availability' : 'View Details'} <ArrowRight className="ml-1" size={13}/></Link>
       </div>
     </div>
