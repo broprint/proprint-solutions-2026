@@ -4,6 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProPrintAssistantV2 } from "@/components/ProPrintAssistantV2";
 import { ProPrintChatAutoScroll } from "@/components/ProPrintChatAutoScroll";
+import { getStoreProducts } from "@/lib/products";
 
 export const metadata: Metadata = {
   title: {
@@ -46,11 +47,13 @@ export const viewport: Viewport = {
   themeColor: "#061321",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const products = await getStoreProducts();
+
   return (
     <html lang="en">
       <body>
-        <Header />
+        <Header products={products} />
         <main>{children}</main>
         <Footer />
         <ProPrintAssistantV2 />
