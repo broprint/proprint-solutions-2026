@@ -9,6 +9,7 @@ export type Product = {
   specs: string[];
   icon: 'laptop' | 'printer' | 'plotter' | 'monitor' | 'network' | 'storage';
   image?: string;
+  images?: string[];
   imageAlt?: string;
   sku?: string;
   stock?: 'In stock' | 'Low stock' | 'Available on order' | 'Request availability' | 'Out of stock' | 'Quote only';
