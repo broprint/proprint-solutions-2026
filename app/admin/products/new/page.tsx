@@ -22,14 +22,16 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
       : error === 'duplicate'
         ? 'That slug or SKU already exists. Please use a unique value.'
         : error === 'image-type'
-          ? 'Choose a JPG, PNG or WebP product image.'
+          ? 'Choose JPG, PNG or WebP product images.'
           : error === 'image-size'
-            ? 'The product image must be 5 MB or smaller.'
-            : error === 'image-upload'
-              ? 'The product image could not be uploaded. Please try again.'
-              : error === 'save'
-                ? 'The product could not be saved. Check the values and try again.'
-                : null;
+            ? 'Each product image must be 5 MB or smaller.'
+            : error === 'image-count'
+              ? 'You can upload up to 5 product images.'
+              : error === 'image-upload'
+                ? 'One of the product images could not be uploaded. Please try again.'
+                : error === 'save'
+                  ? 'The product could not be saved. Check the values and try again.'
+                  : null;
 
   return (
     <main className="min-h-[75vh] bg-slate-50 py-12">
@@ -78,19 +80,19 @@ export default async function NewProductPage({ searchParams }: { searchParams: P
           </section>
 
           <section className="rounded-[2rem] border border-slate-200 bg-white p-6 md:p-8">
-            <h2 className="text-lg font-black text-slate-900">Image & Publishing</h2>
+            <h2 className="text-lg font-black text-slate-900">Images & Publishing</h2>
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <div className="md:col-span-2 rounded-2xl border border-dashed border-blue-200 bg-blue-50/60 p-5">
                 <div className="flex items-start gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#0b5cff] shadow-sm"><ImagePlus size={20} /></div>
                   <div className="min-w-0 flex-1">
-                    <label className={labelClass}>Upload Product Image</label>
-                    <input name="image_file" type="file" accept="image/jpeg,image/png,image/webp" className="mt-3 block w-full text-sm text-slate-700 file:mr-4 file:rounded-full file:border-0 file:bg-[#0b5cff] file:px-5 file:py-2.5 file:text-xs file:font-black file:text-white hover:file:bg-[#064bcf]" />
-                    <p className="mt-2 text-xs leading-5 text-slate-500">JPG, PNG or WebP. Maximum 5 MB. The image will be uploaded to ProPrint's Supabase Storage when you save the product.</p>
+                    <label className={labelClass}>Upload Product Gallery</label>
+                    <input name="image_files" type="file" multiple accept="image/jpeg,image/png,image/webp" className="mt-3 block w-full text-sm text-slate-700 file:mr-4 file:rounded-full file:border-0 file:bg-[#0b5cff] file:px-5 file:py-2.5 file:text-xs file:font-black file:text-white hover:file:bg-[#064bcf]" />
+                    <p className="mt-2 text-xs leading-5 text-slate-500">Choose up to 5 JPG, PNG or WebP images, maximum 5 MB each. The first selected image becomes the main catalog image; the others become thumbnails on the product page.</p>
                   </div>
                 </div>
               </div>
-              <div><label className={labelClass}>Image URL (optional alternative)</label><input name="image_url" type="url" className={fieldClass} placeholder="https://..." /><p className="mt-1 text-xs text-slate-500">If you choose an image file above, the uploaded image will be used instead of this URL.</p></div>
+              <div><label className={labelClass}>Image URL (optional alternative)</label><input name="image_url" type="url" className={fieldClass} placeholder="https://..." /><p className="mt-1 text-xs text-slate-500">Use this only when you are not uploading files above.</p></div>
               <div><label className={labelClass}>Image Alt Text</label><input name="image_alt" className={fieldClass} placeholder="Product image description" /></div>
               <div><label className={labelClass}>Sort Order</label><input name="sort_order" type="number" step="1" defaultValue="0" className={fieldClass} /></div>
               <div className="flex flex-wrap items-end gap-3"><label className="flex items-center gap-3 rounded-xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-700"><input name="featured" type="checkbox" className="h-4 w-4" /> Featured product</label><label className="flex items-center gap-3 rounded-xl bg-blue-50 px-4 py-3 text-sm font-bold text-[#0b5cff]"><input name="published" type="checkbox" className="h-4 w-4" /> Publish immediately</label></div>
