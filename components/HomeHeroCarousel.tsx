@@ -7,9 +7,9 @@ const slides = [
   {
     title: 'Printers & MFPs',
     href: '/shop?category=Printers%20%26%20MFPs',
-    image: 'https://www.buydig.com/shop/product-image.aspx?picId=591897&size=500',
-    imageAlt: 'HP business multifunction printer',
-    fit: 'cover',
+    image: 'https://http2.mlstatic.com/D_NQ_NP_965572-MLU78084574980_082024-F.jpg',
+    imageAlt: 'HP LaserJet Pro MFP 4103fdw business printer',
+    fit: 'contain',
   },
   {
     title: 'Plotters & Wide Format',
@@ -41,7 +41,7 @@ const slides = [
   },
 ] as const;
 
-const ROTATE_MS = 10 * 60 * 1000;
+const ROTATE_MS = 10 * 1000;
 
 export function HomeHeroCarousel() {
   const [active, setActive] = useState(0);
