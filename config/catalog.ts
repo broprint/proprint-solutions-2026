@@ -4,6 +4,9 @@ export const PRODUCT_CATEGORIES = [
   'Plotters & Wide Format',
   'Networking',
   'Servers & Storage',
+  'Monitors & Displays',
+  'UPS & Power',
+  'Consumables',
   'Accessories',
 ] as const;
 
@@ -28,6 +31,17 @@ const CATEGORY_ALIASES: Record<string, ProductCategory> = {
   storage: 'Servers & Storage',
   servers: 'Servers & Storage',
   'servers & storage': 'Servers & Storage',
+  monitors: 'Monitors & Displays',
+  monitor: 'Monitors & Displays',
+  displays: 'Monitors & Displays',
+  'monitors & displays': 'Monitors & Displays',
+  ups: 'UPS & Power',
+  power: 'UPS & Power',
+  'ups & power': 'UPS & Power',
+  consumables: 'Consumables',
+  consumable: 'Consumables',
+  toner: 'Consumables',
+  ink: 'Consumables',
   accessories: 'Accessories',
   accessory: 'Accessories',
   'it accessories': 'Accessories',
@@ -38,15 +52,18 @@ export function normalizeProductCategory(category: string): string {
   return CATEGORY_ALIASES[trimmed.toLowerCase()] ?? trimmed;
 }
 
-// Maps the public homepage category cards to the canonical category values
-// stored by the admin catalog. Keeping this in one place makes the catalog
-// easier to reuse for future white-label deployments.
+// Maps public homepage category cards to canonical category values used by
+// the self-managed catalog. Every homepage card has an explicit destination,
+// including categories that may temporarily contain zero products.
 export const HOME_CATEGORY_FILTERS: Record<string, ProductCategory> = {
   'Laptops & PCs': 'Computers',
   'Printers & MFPs': 'Printers & MFPs',
   'Plotters & Wide Format': 'Plotters & Wide Format',
   Networking: 'Networking',
   'Servers & Storage': 'Servers & Storage',
+  'Monitors & Displays': 'Monitors & Displays',
+  'UPS & Power': 'UPS & Power',
+  Consumables: 'Consumables',
   'IT Accessories': 'Accessories',
 };
 
