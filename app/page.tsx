@@ -13,8 +13,8 @@ const enterprise=['Onsite IT Support','Field Engineering','IMAC Services','Hardw
 const brandLogos=[
   {name:'HP',src:'https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg',className:'h-20 w-20 sm:h-24 sm:w-24'},
   {name:'Lenovo',src:'https://upload.wikimedia.org/wikipedia/commons/b/b8/Lenovo_logo_2015.svg',className:'h-11 w-36 sm:h-14 sm:w-44'},
-  {name:'Epson',src:'https://upload.wikimedia.org/wikipedia/commons/1/1a/Epson_logo.svg',className:'h-11 w-36 sm:h-14 sm:w-44'},
-  {name:'MSI',src:'https://upload.wikimedia.org/wikipedia/commons/2/2e/Micro-Star_International_logo.svg',className:'h-14 w-40 sm:h-16 sm:w-48'},
+  {name:'Epson',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Epson%20logo.svg',className:'h-11 w-36 sm:h-14 sm:w-44'},
+  {name:'MSI',src:'https://commons.wikimedia.org/wiki/Special:Redirect/file/Micro-Star%20International%20logo.svg',className:'h-14 w-40 sm:h-16 sm:w-48'},
   {name:'Dell',src:'https://upload.wikimedia.org/wikipedia/commons/1/18/Dell_logo_2016.svg',className:'h-16 w-28 sm:h-20 sm:w-32'},
 ];
 
