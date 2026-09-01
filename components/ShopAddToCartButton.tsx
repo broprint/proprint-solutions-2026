@@ -12,7 +12,7 @@ function maxQuantity(product:Product){
   return null;
 }
 
-export function ShopAddToCartButton({ product }: { product: Product }) {
+export function ShopAddToCartButton({ product, className = '' }: { product: Product; className?: string }) {
   const [status, setStatus] = useState<'idle'|'added'|'limit'>('idle');
 
   function addToCart() {
@@ -38,7 +38,7 @@ export function ShopAddToCartButton({ product }: { product: Product }) {
     window.setTimeout(() => setStatus('idle'), 1600);
   }
 
-  return <button type="button" onClick={addToCart} className="inline-flex items-center rounded-full bg-[#f47b20] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#dc6815]">
-    <ShoppingCart className="mr-1.5" size={14}/>{status==='added'?'Added to Cart':status==='limit'?'Stock Limit Reached':'Add to Cart'}
+  return <button type="button" onClick={addToCart} className={`inline-flex items-center rounded-full bg-[#f47b20] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#dc6815] ${className}`}>
+    <ShoppingCart className="mr-1.5 shrink-0" size={14}/>{status==='added'?'Added to Cart':status==='limit'?'Stock Limit Reached':'Add to Cart'}
   </button>;
 }
