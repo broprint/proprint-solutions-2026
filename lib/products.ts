@@ -40,6 +40,25 @@ export type DatabaseProduct = {
   updated_at: string;
 };
 
+const SPEC_JUNK = new Set([
+  'information_stroke',
+  'information stroke',
+  'learn more',
+  'show more',
+]);
+
+function cleanSpecification(value: string) {
+  const cleaned = value
+    .replace(/^[•·▪◦\-–—]+\s*/, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  if (!cleaned) return null;
+  if (SPEC_JUNK.has(cleaned.toLowerCase())) return null;
+  if (/^[a-z]$/i.test(cleaned)) return null;
+  return cleaned;
+}
+
 function productIcon(category: string): Product['icon'] {
   const value = category.toLowerCase();
   if (value.includes('laptop') || value.includes('computer') || value.includes('pc')) return 'laptop';
@@ -69,7 +88,10 @@ function stockLabel(product: DatabaseProduct): Product['stock'] {
 
 export function toStoreProduct(product: DatabaseProduct): Product {
   const specs = Array.isArray(product.specifications)
-    ? product.specifications.filter((item): item is string => typeof item === 'string')
+    ? product.specifications
+        .filter((item): item is string => typeof item === 'string')
+        .map(cleanSpecification)
+        .filter((item): item is string => !!item)
     : [];
 
   const gallery = Array.isArray(product.image_urls)
