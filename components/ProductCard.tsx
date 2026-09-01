@@ -46,10 +46,10 @@ export function ProductCard({ product }: { product:Product }) {
         {!product.sku && <div className="mt-3 min-h-4" />}
         <div className="mt-3 flex min-h-7 flex-wrap gap-2 text-[10px] font-bold text-slate-500"><span className="rounded-full bg-slate-100 px-2.5 py-1"><ShieldCheck className="mr-1 inline" size={11}/>Support</span><span className="rounded-full bg-slate-100 px-2.5 py-1"><PackageCheck className="mr-1 inline" size={11}/>Delivery</span></div>
         <div className="mt-5 min-h-12"><div className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{quoteOnly?'Business pricing':'Price'}</div><b className="mt-1 block text-lg">{product.price}</b></div>
-        <div className="mt-4 flex min-h-10 flex-wrap items-end gap-2">
-          {canBuy && <ShopAddToCartButton product={product}/>} 
-          {needsEnquiry && <Link href={`/products/${product.slug}`} className="inline-flex items-center rounded-full border border-[#0b5cff] bg-white px-4 py-2.5 text-xs font-black text-[#0b5cff] transition hover:bg-blue-50">{quoteOnly ? 'Request Price' : 'Check Availability'} <ArrowRight className="ml-1" size={13}/></Link>}
-          <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex items-center rounded-full bg-[#0b5cff] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">View Details <ArrowRight className="ml-1" size={13}/></Link>
+        <div className="mt-4 grid min-h-10 grid-cols-2 items-stretch gap-2">
+          {canBuy && <ShopAddToCartButton product={product} className="w-full justify-center whitespace-nowrap px-2"/>}
+          {needsEnquiry && <Link href={`/products/${product.slug}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full border border-[#0b5cff] bg-white px-2 py-2.5 text-[11px] font-black text-[#0b5cff] transition hover:bg-blue-50">{quoteOnly ? 'Request Price' : 'Check Availability'} <ArrowRight className="ml-1 shrink-0" size={12}/></Link>}
+          <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-[#0b5cff] px-2 py-2.5 text-[11px] font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">View Details <ArrowRight className="ml-1 shrink-0" size={12}/></Link>
         </div>
       </div>
     </div>
