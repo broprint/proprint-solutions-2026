@@ -1,11 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ShoppingCart } from 'lucide-react';
 import type { Product } from '@/data/catalog';
 
-type CartItem = { slug:string; quantity:number };
+type CartItem = { slug: string; quantity: number };
 const CART_KEY = 'proprint-cart-v1';
 
 function maxQuantity(product:Product){
@@ -13,9 +12,8 @@ function maxQuantity(product:Product){
   return null;
 }
 
-export function AddToCartButton({ product }: { product:Product }) {
-  const router = useRouter();
-  const [limitReached,setLimitReached]=useState(false);
+export function ShopAddToCartButton({ product, className = '' }: { product: Product; className?: string }) {
+  const [status, setStatus] = useState<'idle'|'added'|'limit'>('idle');
 
   function addToCart() {
     const raw = window.localStorage.getItem(CART_KEY);
@@ -26,8 +24,8 @@ export function AddToCartButton({ product }: { product:Product }) {
     const existing = items.find((item) => item.slug === product.slug);
     const current=Math.max(0,Number(existing?.quantity)||0);
     if(max!==null&&current>=max){
-      setLimitReached(true);
-      window.setTimeout(()=>setLimitReached(false),1800);
+      setStatus('limit');
+      window.setTimeout(()=>setStatus('idle'),1800);
       return;
     }
 
@@ -36,10 +34,11 @@ export function AddToCartButton({ product }: { product:Product }) {
 
     window.localStorage.setItem(CART_KEY, JSON.stringify(items));
     window.dispatchEvent(new Event('proprint-cart-updated'));
-    router.push('/cart');
+    setStatus('added');
+    window.setTimeout(() => setStatus('idle'), 1600);
   }
 
-  return <button onClick={addToCart} className="rounded-full bg-[#f47b20] px-6 py-3.5 font-black text-white shadow-sm transition hover:-translate-y-0.5">
-    <ShoppingCart className="mr-2 inline" size={17}/>{limitReached?'Stock Limit Reached':'Add to Cart'}
+  return <button type="button" onClick={addToCart} className={`inline-flex items-center rounded-full bg-[#f47b20] px-4 py-2.5 text-xs font-black text-white shadow-sm transition hover:bg-[#dc6815] ${className}`}>
+    <ShoppingCart className="mr-1.5 shrink-0" size={14}/>{status==='added'?'Added to Cart':status==='limit'?'Stock Limit Reached':'Add to Cart'}
   </button>;
 }

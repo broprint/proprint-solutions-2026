@@ -10,14 +10,18 @@ function numericPrice(price: string) {
   return match ? Number(match[1]) : null;
 }
 
-export function ShopCatalog({ products }: { products: Product[] }) {
+export function ShopCatalog({ products, initialCategory = 'All' }: { products: Product[]; initialCategory?: string }) {
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('All');
+  const [category, setCategory] = useState(initialCategory);
   const [brand, setBrand] = useState('All');
   const [price, setPrice] = useState('All');
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const categories = useMemo(() => ['All', ...Array.from(new Set(products.map((p) => p.category))).sort()], [products]);
+  const categories = useMemo(() => {
+    const values = ['All', ...Array.from(new Set(products.map((p) => p.category))).sort()];
+    if (initialCategory !== 'All' && !values.includes(initialCategory)) values.push(initialCategory);
+    return values;
+  }, [products, initialCategory]);
   const brands = useMemo(() => ['All', ...Array.from(new Set(products.map((p) => p.brand))).sort()], [products]);
 
   const filtered = useMemo(() => {
@@ -38,20 +42,27 @@ export function ShopCatalog({ products }: { products: Product[] }) {
 
   const clearFilters = () => { setQuery(''); setCategory('All'); setBrand('All'); setPrice('All'); };
   const hasFilters = query || category !== 'All' || brand !== 'All' || price !== 'All';
+  const productGridClass = filtered.length === 1
+    ? 'mx-auto max-w-[300px] grid-cols-1'
+    : filtered.length === 2
+      ? 'mx-auto max-w-[620px] grid-cols-1 sm:grid-cols-2'
+      : filtered.length === 3
+        ? 'mx-auto max-w-[940px] grid-cols-1 sm:grid-cols-2 xl:grid-cols-3'
+        : 'grid-cols-[repeat(auto-fill,minmax(235px,1fr))]';
 
   return <>
     <section className="border-b bg-white"><div className="container py-5"><div className="flex gap-3 overflow-x-auto pb-1">{categories.map((name) => <button key={name} onClick={() => setCategory(name)} className={`whitespace-nowrap rounded-full border px-4 py-2 text-xs font-black transition ${category === name ? 'border-[#0b5cff] bg-[#0b5cff] text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300'}`}>{name}</button>)}</div></div></section>
-    <section className="py-14"><div className="container"><div className="grid gap-7 lg:grid-cols-[260px_1fr]">
-      <aside className={`${filtersOpen ? 'block' : 'hidden'} h-fit rounded-[1.5rem] border border-slate-200 bg-white p-5 lg:block`}>
-        <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-black"><SlidersHorizontal size={17}/> Filters</div><button onClick={() => setFiltersOpen(false)} className="lg:hidden" aria-label="Close filters"><X size={18}/></button></div>
-        <label className="mt-6 block text-xs font-black uppercase tracking-wider text-slate-500">Brand</label><select value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-400">{brands.map((item) => <option key={item}>{item}</option>)}</select>
-        <label className="mt-5 block text-xs font-black uppercase tracking-wider text-slate-500">Price</label><select value={price} onChange={(e) => setPrice(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-blue-400">{['All', 'Under KD 100', 'KD 100–250', 'KD 250+', 'Request Quote'].map((item) => <option key={item}>{item}</option>)}</select>
-        <div className="mt-6 rounded-2xl bg-blue-50 p-4 text-sm leading-6 text-slate-600"><b className="block text-slate-900">Business customer?</b>Ask ProPrint for bulk pricing, deployment and AMC support.</div>
-        {hasFilters && <button onClick={clearFilters} className="mt-5 w-full rounded-xl border border-slate-200 py-3 text-xs font-black text-slate-700 hover:bg-slate-50">Clear all filters</button>}
+    <section className="py-6 sm:py-8 xl:py-10"><div className="mx-auto w-[calc(100%-32px)] sm:w-[calc(100%-48px)]"><div className="grid gap-4 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-5 xl:gap-6">
+      <aside className={`${filtersOpen ? 'block' : 'hidden'} h-fit rounded-[1.5rem] border border-slate-200 bg-white p-4 sm:p-5 lg:block`}>
+        <div className="flex items-center justify-between"><div className="flex items-center gap-2 font-black"><SlidersHorizontal size={17}/> Filters</div><button onClick={() => setFiltersOpen(false)} className="rounded-lg p-1 lg:hidden" aria-label="Close filters"><X size={18}/></button></div>
+        <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 sm:mt-6">Brand</label><select value={brand} onChange={(e) => setBrand(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-400 sm:py-3">{brands.map((item) => <option key={item}>{item}</option>)}</select>
+        <label className="mt-4 block text-xs font-black uppercase tracking-wider text-slate-500 sm:mt-5">Price</label><select value={price} onChange={(e) => setPrice(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-blue-400 sm:py-3">{['All', 'Under KD 100', 'KD 100–250', 'KD 250+', 'Request Quote'].map((item) => <option key={item}>{item}</option>)}</select>
+        <div className="mt-4 rounded-2xl bg-blue-50 p-3 text-sm leading-5 text-slate-600 sm:mt-6 sm:p-4 sm:leading-6"><b className="block text-slate-900">Business customer?</b>Ask ProPrint for bulk pricing, deployment and AMC support.</div>
+        {hasFilters && <button onClick={clearFilters} className="mt-4 w-full rounded-xl border border-slate-200 py-2.5 text-xs font-black text-slate-700 hover:bg-slate-50 sm:mt-5 sm:py-3">Clear all filters</button>}
       </aside>
-      <div><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-3xl font-black tracking-[-.03em]">Shop products</h2><p className="mt-1 text-sm text-slate-500">{filtered.length} product{filtered.length === 1 ? '' : 's'} shown · management demo catalog</p></div><button onClick={() => setFiltersOpen((value) => !value)} className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-bold lg:hidden"><SlidersHorizontal size={16}/> Filters</button></div>
-        <div className="mt-6 flex items-center rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"><Search className="ml-3 text-slate-400" size={19}/><input value={query} onChange={(e) => setQuery(e.target.value)} className="w-full px-3 py-2.5 text-sm outline-none" placeholder="Search products, brands, models, SKU or specifications..." aria-label="Search product catalog"/>{query && <button onClick={() => setQuery('')} className="mr-2 rounded-full p-2 text-slate-400 hover:bg-slate-100" aria-label="Clear search"><X size={16}/></button>}</div>
-        {filtered.length ? <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">{filtered.map((product) => <ProductCard key={product.slug} product={product}/>)}</div> : <div className="mt-8 rounded-[1.5rem] border border-dashed border-slate-300 bg-white px-6 py-16 text-center"><h3 className="text-xl font-black">No products match those filters.</h3><p className="mt-2 text-sm text-slate-500">Try another brand, category or price range.</p><button onClick={clearFilters} className="mt-5 rounded-full bg-[#071525] px-5 py-2.5 text-sm font-black text-white">Reset filters</button></div>}
+      <div className="min-w-0"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-3xl font-black tracking-[-.03em]">Shop products</h2><p className="mt-1 text-sm text-slate-500">{filtered.length} product{filtered.length === 1 ? '' : 's'} shown · ProPrint-managed catalog</p></div><button onClick={() => setFiltersOpen((value) => !value)} className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-bold lg:hidden"><SlidersHorizontal size={16}/> Filters</button></div>
+        <div className="mt-5 flex items-center rounded-2xl border border-slate-200 bg-white p-2 shadow-sm"><Search className="ml-3 text-slate-400" size={19}/><input value={query} onChange={(e) => setQuery(e.target.value)} className="w-full px-3 py-2.5 text-sm outline-none" placeholder="Search products, brands, models, SKU or specifications..." aria-label="Search product catalog"/>{query && <button onClick={() => setQuery('')} className="mr-2 rounded-full p-2 text-slate-400 hover:bg-slate-100" aria-label="Clear search"><X size={16}/></button>}</div>
+        {filtered.length ? <div className={`mt-6 grid gap-4 ${productGridClass}`}>{filtered.map((product) => <ProductCard key={product.slug} product={product}/>)}</div> : <div className="mt-8 rounded-[1.5rem] border border-dashed border-slate-300 bg-white px-6 py-16 text-center"><h3 className="text-xl font-black">No products currently available in this category.</h3><p className="mt-2 text-sm text-slate-500">Try another category or check back as new products are added.</p><button onClick={clearFilters} className="mt-5 rounded-full bg-[#071525] px-5 py-2.5 text-sm font-black text-white">View all products</button></div>}
       </div>
     </div></div></section>
   </>;

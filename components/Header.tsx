@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Menu, Search, ShoppingCart, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { products } from '@/data/catalog';
+import type { Product } from '@/data/catalog';
 
 const nav = [
   ['Products','/#products'],['Solutions','/#solutions'],['Services','/service'],['AMC','/amc'],['Enterprise IT','/enterprise'],['Brands','/#brands'],['About','/about'],['Contact','/contact']
@@ -21,7 +21,7 @@ function readCartCount() {
   }
 }
 
-export function Header(){
+export function Header({ products = [] }: { products?: Product[] }){
  const [open,setOpen]=useState(false);
  const [cartCount,setCartCount]=useState(0);
  const [searchQuery,setSearchQuery]=useState('');
@@ -37,7 +37,7 @@ export function Header(){
      product.sku || '',
      ...product.specs,
    ].join(' ').toLowerCase().includes(q)).slice(0,6);
- },[searchQuery]);
+ },[searchQuery,products]);
 
  useEffect(()=>{
    const sync=()=>setCartCount(readCartCount());
@@ -65,44 +65,21 @@ export function Header(){
       <div className="relative hidden 2xl:block">
         <div className="flex h-11 w-56 items-center rounded-full border border-slate-200 bg-slate-50 px-4 transition focus-within:border-blue-300 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-100">
           <Search size={17} className="shrink-0 text-slate-400"/>
-          <input
-            aria-label="Search products"
-            value={searchQuery}
-            onChange={e=>{setSearchQuery(e.target.value);setSearchOpen(true)}}
-            onFocus={()=>setSearchOpen(true)}
-            onKeyDown={e=>{if(e.key==='Escape')setSearchOpen(false)}}
-            className="w-full bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400"
-            placeholder="Search products..."
-            autoComplete="off"
-          />
+          <input aria-label="Search products" value={searchQuery} onChange={e=>{setSearchQuery(e.target.value);setSearchOpen(true)}} onFocus={()=>setSearchOpen(true)} onKeyDown={e=>{if(e.key==='Escape')setSearchOpen(false)}} className="w-full bg-transparent px-2 text-sm text-slate-900 outline-none placeholder:text-slate-400" placeholder="Search products..." autoComplete="off"/>
           {searchQuery&&<button type="button" onClick={closeSearch} aria-label="Clear product search" className="rounded-full p-1 text-slate-400 hover:bg-slate-200 hover:text-slate-700"><X size={14}/></button>}
         </div>
         {searchOpen&&searchQuery.trim()&&<div className="absolute right-0 top-[calc(100%+10px)] z-[70] w-[360px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/15">
-          {searchResults.length>0?<>
-            <div className="border-b border-slate-100 px-4 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-slate-400">Product matches</div>
-            <div className="max-h-[360px] overflow-y-auto">
-              {searchResults.map(product=><Link key={product.slug} href={`/products/${product.slug}`} onClick={closeSearch} className="block border-b border-slate-100 px-4 py-3 transition last:border-0 hover:bg-blue-50">
-                <div className="flex items-start justify-between gap-3">
-                  <div><div className="text-sm font-black text-slate-900">{product.name}</div><div className="mt-1 text-xs text-slate-500">{product.brand} • {product.category}</div><div className="mt-1 text-[11px] text-slate-400">{product.specs.slice(0,3).join(' • ')}</div></div>
-                  <div className="shrink-0 text-xs font-black text-[#0b5cff]">View</div>
-                </div>
-              </Link>)}
-            </div>
-            <Link href="/shop" onClick={closeSearch} className="block bg-slate-50 px-4 py-3 text-center text-xs font-black text-[#0b5cff] transition hover:bg-blue-50">Browse all products →</Link>
-          </>:<div className="p-5 text-center"><div className="text-sm font-black text-slate-900">No matching products found</div><p className="mt-1 text-xs leading-5 text-slate-500">Try a brand, category, model or specification.</p><Link href="/shop" onClick={closeSearch} className="mt-3 inline-flex rounded-full bg-[#0b5cff] px-4 py-2 text-xs font-black text-white">Browse Shop</Link></div>}
+          {searchResults.length>0?<><div className="border-b border-slate-100 px-4 py-2.5 text-[10px] font-black uppercase tracking-[.14em] text-slate-400">Product matches</div><div className="max-h-[360px] overflow-y-auto">{searchResults.map(product=><Link key={product.slug} href={`/products/${product.slug}`} onClick={closeSearch} className="block border-b border-slate-100 px-4 py-3 transition last:border-0 hover:bg-blue-50"><div className="flex items-start justify-between gap-3"><div><div className="text-sm font-black text-slate-900">{product.name}</div><div className="mt-1 text-xs text-slate-500">{product.brand} • {product.category}</div><div className="mt-1 text-[11px] text-slate-400">{product.specs.slice(0,3).join(' • ')}</div></div><div className="shrink-0 text-xs font-black text-[#0b5cff]">View</div></div></Link>)}</div><Link href="/shop" onClick={closeSearch} className="block bg-slate-50 px-4 py-3 text-center text-xs font-black text-[#0b5cff] transition hover:bg-blue-50">Browse all products →</Link></>:<div className="p-5 text-center"><div className="text-sm font-black text-slate-900">No matching products found</div><p className="mt-1 text-xs leading-5 text-slate-500">Try a brand, category, model or specification.</p><Link href="/shop" onClick={closeSearch} className="mt-3 inline-flex rounded-full bg-[#0b5cff] px-4 py-2 text-xs font-black text-white">Browse Shop</Link></div>}
         </div>}
       </div>
       <Link href="/quote" className="hidden rounded-full border border-slate-200 px-4 py-3 text-sm font-black text-slate-800 transition hover:border-[#0b5cff] hover:text-[#0b5cff] lg:inline-flex">Request Quote</Link>
       <Link href="/shop" className="hidden rounded-full bg-[#f47b20] px-5 py-3 text-sm font-black text-white shadow-lg shadow-orange-500/20 transition hover:-translate-y-0.5 sm:inline-flex">Shop Online</Link>
-      <Link href="/cart" aria-label={`Cart with ${cartCount} item${cartCount===1?'':'s'}`} className="relative hidden rounded-xl border border-slate-200 p-2.5 md:block">
-        <ShoppingCart size={19}/>
-        {cartCount>0&&<span className="absolute -right-2 -top-2 grid min-h-5 min-w-5 place-items-center rounded-full bg-[#f47b20] px-1 text-[10px] font-black leading-none text-white shadow-sm">{cartCount>99?'99+':cartCount}</span>}
-      </Link>
+      <Link href="/cart" aria-label={`Cart with ${cartCount} item${cartCount===1?'':'s'}`} className="relative hidden rounded-xl border border-slate-200 p-2.5 md:block"><ShoppingCart size={19}/>{cartCount>0&&<span className="absolute -right-2 -top-2 grid min-h-5 min-w-5 place-items-center rounded-full bg-[#f47b20] px-1 text-[10px] font-black leading-none text-white shadow-sm">{cartCount>99?'99+':cartCount}</span>}</Link>
       <button aria-label={open?'Close menu':'Open menu'} aria-expanded={open} onClick={()=>setOpen(!open)} className="rounded-xl border border-slate-200 p-2.5 xl:hidden">{open?<X size={21}/>:<Menu size={21}/>}</button>
     </div>
    </div>
    <div className="hidden border-t border-slate-100 lg:block"><div className="container flex h-11 items-center gap-7 overflow-x-auto whitespace-nowrap text-[11px] font-black uppercase tracking-[.08em] text-slate-600"><Link href="/shop">Computers</Link><Link href="/shop">Printing</Link><Link href="/shop">Plotters</Link><Link href="/shop">Networking</Link><Link href="/shop">Servers & Storage</Link><Link href="/shop">Accessories</Link><Link href="/service">Service Center</Link><Link href="/amc">AMC</Link><Link href="/enterprise">Enterprise IT</Link></div></div>
-   {open&&<div className="border-t bg-white xl:hidden"><div className="container grid gap-1 py-4 text-sm font-bold">{nav.map(([label,href])=><Link onClick={()=>setOpen(false)} className="rounded-xl px-3 py-3 hover:bg-slate-50" key={label} href={href}>{label}</Link>)}<div className="mt-3 grid grid-cols-2 gap-2"><Link onClick={()=>setOpen(false)} className="rounded-xl bg-[#0b5cff] px-3 py-3 text-center text-white" href="/quote">Request Quote</Link><Link onClick={()=>setOpen(false)} className="rounded-xl bg-[#f47b20] px-3 py-3 text-center text-white" href="/shop">Shop Online</Link></div><Link onClick={()=>setOpen(false)} className="mt-1 rounded-xl border border-slate-200 px-3 py-3 text-center" href="/cart">View Cart{cartCount>0?` (${cartCount})`:''}</Link></div></div>}
+   {open&&<div className="border-t bg-white xl:hidden"><div className="container grid gap-0.5 py-2.5 text-sm font-bold sm:gap-1 sm:py-4">{nav.map(([label,href])=><Link onClick={()=>setOpen(false)} className="rounded-xl px-3 py-2 hover:bg-slate-50 sm:py-3" key={label} href={href}>{label}</Link>)}<div className="mt-2 grid grid-cols-2 gap-2 sm:mt-3"><Link onClick={()=>setOpen(false)} className="rounded-xl bg-[#0b5cff] px-3 py-2.5 text-center text-white sm:py-3" href="/quote">Request Quote</Link><Link onClick={()=>setOpen(false)} className="rounded-xl bg-[#f47b20] px-3 py-2.5 text-center text-white sm:py-3" href="/shop">Shop Online</Link></div><Link onClick={()=>setOpen(false)} className="mt-1 rounded-xl border border-slate-200 px-3 py-2.5 text-center sm:py-3" href="/cart">View Cart{cartCount>0?` (${cartCount})`:''}</Link></div></div>}
   </header>
  </>;
 }

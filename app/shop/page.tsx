@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Building2, Headphones, Truck } from 'lucide-react';
 import { ShopCatalog } from '@/components/ShopCatalog';
-import { products } from '@/data/catalog';
+import { getStoreProducts } from '@/lib/products';
 
 const trustItems = [
   [BadgeCheck, 'Genuine products', 'Technology from trusted brands'],
@@ -10,7 +10,11 @@ const trustItems = [
   [Building2, 'Business procurement', 'Bulk quotes, deployment and AMC'],
 ] as const;
 
-export default function ShopPage() {
+export default async function ShopPage({ searchParams }: { searchParams: Promise<{ category?: string }> }) {
+  const products = await getStoreProducts();
+  const params = await searchParams;
+  const initialCategory = params.category?.trim() || 'All';
+
   return (
     <main>
       <section className="relative overflow-hidden bg-[#061321] py-16 text-white md:py-20">
@@ -38,7 +42,7 @@ export default function ShopPage() {
         </div>
       </section>
 
-      <div id="catalog"><ShopCatalog products={products}/></div>
+      <div id="catalog"><ShopCatalog products={products} initialCategory={initialCategory}/></div>
 
       <section className="pb-20">
         <div className="container grid gap-5 lg:grid-cols-2">
