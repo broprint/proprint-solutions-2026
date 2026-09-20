@@ -55,7 +55,7 @@ export default async function AdminLoginPage({
             <button type="submit" className="w-full rounded-full bg-[#061321] px-6 py-3.5 text-sm font-black text-white shadow-sm transition hover:bg-[#0b5cff]">Sign in to Product Manager</button>
           </form>
 
-          <a href="/admin/reset-password" className="mt-4 block text-center text-xs font-bold text-[#0b5cff] hover:underline">Forgot your password?</a>
+          <a href="/admin/forgot-password" className="mt-4 block text-center text-xs font-bold text-[#0b5cff] hover:underline">Forgot your password?</a>
 
           <div className="mt-7 flex gap-3 rounded-2xl bg-blue-50 p-4 text-xs leading-5 text-slate-600">
             <ShieldCheck className="mt-0.5 shrink-0 text-[#0b5cff]" size={18} />
