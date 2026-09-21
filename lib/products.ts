@@ -13,6 +13,10 @@ export type DatabaseProduct = {
   short_description: string | null;
   description: string | null;
   specifications: string[];
+  name_ar: string | null;
+  short_description_ar: string | null;
+  description_ar: string | null;
+  specifications_ar: string[];
 
   price: number | null;
   old_price: number | null;
