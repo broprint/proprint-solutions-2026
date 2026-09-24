@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { ShoppingCart } from 'lucide-react';
 import type { Product } from '@/data/catalog';
 
@@ -14,6 +15,7 @@ function maxQuantity(product:Product){
 }
 
 export function AddToCartButton({ product }: { product:Product }) {
+  const pathname=usePathname(); const ar=pathname==='/ar'||pathname.startsWith('/ar/');
   const router = useRouter();
   const [limitReached,setLimitReached]=useState(false);
 
@@ -36,10 +38,10 @@ export function AddToCartButton({ product }: { product:Product }) {
 
     window.localStorage.setItem(CART_KEY, JSON.stringify(items));
     window.dispatchEvent(new Event('proprint-cart-updated'));
-    router.push('/cart');
+    router.push(ar?'/ar/cart':'/cart');
   }
 
   return <button onClick={addToCart} className="rounded-full bg-[#f47b20] px-6 py-3.5 font-black text-white shadow-sm transition hover:-translate-y-0.5">
-    <ShoppingCart className="mr-2 inline" size={17}/>{limitReached?'Stock Limit Reached':'Add to Cart'}
+    <ShoppingCart className="mr-2 inline" size={17}/>{limitReached?(ar?'تم بلوغ حد المخزون':'Stock Limit Reached'):(ar?'أضف إلى السلة':'Add to Cart')}
   </button>;
 }
