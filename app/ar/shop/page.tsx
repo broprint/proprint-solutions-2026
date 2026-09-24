@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { BadgeCheck, Building2, Headphones, Truck } from 'lucide-react';
 import { ShopCatalog } from '@/components/ShopCatalog';
-import { getStoreProducts } from '@/lib/products';
+import { getArabicStoreProducts } from '@/lib/products';
 
 const trustItems=[
  [BadgeCheck,'منتجات أصلية','تقنية من علامات تجارية موثوقة'],
@@ -11,7 +11,7 @@ const trustItems=[
 ] as const;
 
 export default async function ArabicShopPage({searchParams}:{searchParams:Promise<{category?:string}>}){
- const products=await getStoreProducts();
+ const products=await getArabicStoreProducts();
  const params=await searchParams;
  const initialCategory=params.category?.trim()||'All';
  return <main dir="rtl" lang="ar" className="text-right">
