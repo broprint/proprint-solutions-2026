@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, ChevronDown, PackageCheck, ShieldCheck } from 'lucide-react';
 import type { Product } from '@/data/catalog';
@@ -10,6 +11,10 @@ import { ShopAddToCartButton } from './ShopAddToCartButton';
 const SPEC_PREVIEW_COUNT = 3;
 
 export function ProductCard({ product }: { product:Product }) {
+  const pathname=usePathname();
+  const ar=pathname==='/ar'||pathname.startsWith('/ar/');
+  const T=(en:string,arabic:string)=>ar?arabic:en;
+  const stockAr:Record<string,string>={'In stock':'متوفر','Low stock':'كمية محدودة','Available on order':'متوفر بالطلب','Request availability':'تحقق من التوفر','Out of stock':'غير متوفر حالياً','Quote only':'السعر عند الطلب','Available':'متوفر'};
   const [showAllSpecs, setShowAllSpecs] = useState(false);
   const quoteOnly = product.priceOnRequest || product.stock === 'Quote only' || product.price.toLowerCase().includes('quote');
   const inStock = (product.stock === 'In stock' || product.stock === 'Low stock') && (product.stockQuantity ?? 0) > 0;
@@ -31,25 +36,25 @@ export function ProductCard({ product }: { product:Product }) {
       {product.badge && <span className="absolute left-3 top-3 z-30 rounded-full bg-white px-2.5 py-1 text-[8px] font-black tracking-widest text-[#0b5cff] shadow-sm">{product.badge}</span>}
     </div>
     <div className="flex flex-1 flex-col p-4">
-      <div className="flex min-h-7 items-start justify-between gap-2"><div className="text-[9px] font-black uppercase tracking-[.12em] text-slate-400">{product.brand} • {product.category}</div><span className={`flex shrink-0 items-center gap-1 text-[9px] font-black ${availabilityClass}`}><CheckCircle2 size={11}/>{available}{inStock && product.stockQuantity!==undefined ? ` · ${product.stockQuantity}` : ''}</span></div>
+      <div className="flex min-h-7 items-start justify-between gap-2"><div className="text-[9px] font-black uppercase tracking-[.12em] text-slate-400">{product.brand} • {product.category}</div><span className={`flex shrink-0 items-center gap-1 text-[9px] font-black ${availabilityClass}`}><CheckCircle2 size={11}/>{ar?(stockAr[available]||available):available}{inStock && product.stockQuantity!==undefined ? ` · ${product.stockQuantity}` : ''}</span></div>
       <h3 className="mt-1.5 min-h-12 text-[16px] font-black leading-5 text-slate-900">{product.name}</h3>
 
       <div className="mt-1.5 min-h-[6.75rem] border-t border-slate-100 pt-2.5">
         <ul className="space-y-0.5 text-[12px] leading-[1.15rem] text-slate-500">
           {visibleSpecs.map((spec, index) => <li key={`${spec}-${index}`} className="before:mr-1.5 before:content-['•']">{spec}</li>)}
         </ul>
-        {hasMoreSpecs && <button type="button" onClick={()=>setShowAllSpecs(value=>!value)} className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-black text-[#0b5cff] hover:text-[#084bcf]" aria-expanded={showAllSpecs}>{showAllSpecs ? 'See less' : 'See more'} <ChevronDown size={13} className={`transition-transform ${showAllSpecs ? 'rotate-180' : ''}`}/></button>}
+        {hasMoreSpecs && <button type="button" onClick={()=>setShowAllSpecs(value=>!value)} className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-black text-[#0b5cff] hover:text-[#084bcf]" aria-expanded={showAllSpecs}>{showAllSpecs ? T('See less','عرض أقل') : T('See more','عرض المزيد')} <ChevronDown size={13} className={`transition-transform ${showAllSpecs ? 'rotate-180' : ''}`}/></button>}
       </div>
 
       <div className="mt-auto">
-        {product.sku && <div className="mt-2 min-h-3 text-[8px] font-bold uppercase tracking-wider text-slate-400">SKU: {product.sku}</div>}
+        {product.sku && <div className="mt-2 min-h-3 text-[8px] font-bold uppercase tracking-wider text-slate-400">{T('SKU','رمز المنتج')}: {product.sku}</div>}
         {!product.sku && <div className="mt-2 min-h-3" />}
-        <div className="mt-2 flex min-h-6 flex-wrap gap-1.5 text-[9px] font-bold text-slate-500"><span className="rounded-full bg-slate-100 px-2 py-1"><ShieldCheck className="mr-1 inline" size={10}/>Support</span><span className="rounded-full bg-slate-100 px-2 py-1"><PackageCheck className="mr-1 inline" size={10}/>Delivery</span></div>
-        <div className="mt-3 min-h-10"><div className="text-[8px] font-bold uppercase tracking-wider text-slate-400">{quoteOnly?'Business pricing':'Price'}</div><b className="mt-0.5 block text-base">{product.price}</b></div>
+        <div className="mt-2 flex min-h-6 flex-wrap gap-1.5 text-[9px] font-bold text-slate-500"><span className="rounded-full bg-slate-100 px-2 py-1"><ShieldCheck className="mr-1 inline" size={10}/> {T('Support','الدعم')}</span><span className="rounded-full bg-slate-100 px-2 py-1"><PackageCheck className="mr-1 inline" size={10}/> {T('Delivery','التوصيل')}</span></div>
+        <div className="mt-3 min-h-10"><div className="text-[8px] font-bold uppercase tracking-wider text-slate-400">{quoteOnly?T('Business pricing','سعر الشركات'):T('Price','السعر')}</div><b className="mt-0.5 block text-base">{product.price}</b></div>
         <div className="mt-2.5 grid min-h-9 grid-cols-2 items-stretch gap-2">
           {canBuy && <ShopAddToCartButton product={product} className="w-full justify-center whitespace-nowrap px-2 py-2 text-[10px]"/>}
-          {needsEnquiry && <Link href={`/products/${product.slug}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full border border-[#0b5cff] bg-white px-2 py-2 text-[10px] font-black text-[#0b5cff] transition hover:bg-blue-50">{quoteOnly ? 'Request Price' : 'Check Availability'} <ArrowRight className="ml-1 shrink-0" size={11}/></Link>}
-          <Link href={`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-[#0b5cff] px-2 py-2 text-[10px] font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">View Details <ArrowRight className="ml-1 shrink-0" size={11}/></Link>
+          {needsEnquiry && <Link href={ar?`/ar/products/${product.slug}`:`/products/${product.slug}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full border border-[#0b5cff] bg-white px-2 py-2 text-[10px] font-black text-[#0b5cff] transition hover:bg-blue-50">{quoteOnly ? T('Request Price','اطلب السعر') : T('Check Availability','تحقق من التوفر')} <ArrowRight className="ml-1 shrink-0" size={11}/></Link>}
+          <Link href={ar?`/ar/products/${product.slug}`:`/products/${product.slug}`} aria-label={`View details for ${product.name}`} className="inline-flex w-full items-center justify-center whitespace-nowrap rounded-full bg-[#0b5cff] px-2 py-2 text-[10px] font-black text-white shadow-sm transition hover:bg-[#084bcf] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b5cff] focus-visible:ring-offset-2">{T('View Details','عرض التفاصيل')} <ArrowRight className="ml-1 shrink-0" size={11}/></Link>
         </div>
       </div>
     </div>
