@@ -23,7 +23,7 @@ function maxQuantity(product:Product){
 }
 
 export function CartClient({ products, locale='en' }:{ products:Product[]; locale?:'en'|'ar' }){
-  const isArabic=locale==='ar';
+  const isArabic=locale==='ar'||(typeof window!=='undefined'&&window.location.pathname.startsWith('/ar/'));
   const shopHref=isArabic?'/ar/shop':'/shop';
   const productHref=(slug:string)=>isArabic?`/ar/products/${slug}`:`/products/${slug}`;
   const t=(en:string,ar:string)=>isArabic?ar:en;
