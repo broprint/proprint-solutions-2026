@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Building2, LockKeyhole } from 'lucide-react';
-import { CartClient } from '@/components/CartClient';
+import { ArabicCartClient } from '@/components/ArabicCartClient';
 import { getArabicStoreProducts } from '@/lib/products';
 
 export default async function ArabicCartPage(){
@@ -12,7 +12,7 @@ export default async function ArabicCartPage(){
    <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">يتم حفظ المنتجات المضافة إلى سلتك على هذا الجهاز. تؤكد ProPrint المخزون النهائي والسعر والتوصيل قبل معالجة الطلب.</p>
   </div></section>
   <section className="py-14"><div className="container grid gap-7 lg:grid-cols-[1fr_360px]">
-   <CartClient products={products} locale="ar"/>
+   <ArabicCartClient products={products}/>
    <aside className="h-fit rounded-[2rem] bg-slate-100 p-7">
     <h2 className="text-xl font-black">مشتريات للشركات؟</h2>
     <p className="mt-2 text-sm leading-6 text-slate-600">لشراء عدة أجهزة أو مشاريع التجهيز والتركيب أو عقود الصيانة، اطلب عرض سعر للشركات.</p>
