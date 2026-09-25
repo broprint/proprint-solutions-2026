@@ -22,8 +22,8 @@ function maxQuantity(product:Product){
   return hasFiniteStock(product)?Math.max(0,product.stockQuantity??0):null;
 }
 
-export function CartClient({ products, locale='en' }:{ products:Product[]; locale?:'en'|'ar' }){
-  const isArabic=locale==='ar'||(typeof window!=='undefined'&&window.location.pathname.startsWith('/ar/'));
+export function ArabicCartClient({ products }:{ products:Product[] }){
+  const isArabic=true;
   const shopHref=isArabic?'/ar/shop':'/shop';
   const productHref=(slug:string)=>isArabic?`/ar/products/${slug}`:`/products/${slug}`;
   const t=(en:string,ar:string)=>isArabic?ar:en;

@@ -13,6 +13,10 @@ export type DatabaseProduct = {
   short_description: string | null;
   description: string | null;
   specifications: string[];
+  name_ar: string | null;
+  short_description_ar: string | null;
+  description_ar: string | null;
+  specifications_ar: string[];
 
   price: number | null;
   old_price: number | null;
@@ -144,7 +148,25 @@ export async function getPublishedProducts(): Promise<DatabaseProduct[]> {
   return (data ?? []) as DatabaseProduct[];
 }
 
+export function toArabicStoreProduct(product: DatabaseProduct): Product {
+  const base = toStoreProduct(product);
+  const specs = Array.isArray(product.specifications_ar)
+    ? product.specifications_ar.filter((item): item is string => typeof item === 'string' && item.trim().length > 0)
+    : [];
+  return {
+    ...base,
+    name: product.name_ar?.trim() || base.name,
+    specs: specs.length ? specs : base.specs,
+    imageAlt: product.name_ar?.trim() || base.imageAlt,
+  };
+}
+
 export async function getStoreProducts(): Promise<Product[]> {
   const products = await getPublishedProducts();
   return products.map(toStoreProduct);
+}
+
+export async function getArabicStoreProducts(): Promise<Product[]> {
+  const products = await getPublishedProducts();
+  return products.map(toArabicStoreProduct);
 }
