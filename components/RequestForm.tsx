@@ -44,29 +44,29 @@ export function RequestForm({ mode, product = '', sku = '', requestKind = 'busin
         body: JSON.stringify({ ...body, type: mode })
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Submission failed');
+      if (!response.ok) throw new Error(result.error || T('Submission failed','فشل إرسال الطلب'));
 
       setReference(result.reference || '');
       setMessage(result.delivery === 'demo'
-        ? 'Demo submission recorded successfully. Email delivery will be enabled after management approval and domain configuration.'
-        : 'Your request has been submitted successfully.');
+        ? T('Demo submission recorded successfully. Email delivery will be enabled after management approval and domain configuration.','تم تسجيل الطلب التجريبي بنجاح. سيتم تفعيل إرسال البريد الإلكتروني بعد موافقة الإدارة وإعداد النطاق.')
+        : T('Your request has been submitted successfully.','تم إرسال طلبك بنجاح.'));
       setStatus('success');
       formElement.reset();
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Unable to submit your request.');
+      setMessage(error instanceof Error ? error.message : T('Unable to submit your request.','تعذر إرسال طلبك.'));
       setStatus('error');
     }
   }
 
   const defaultMessage = hasProduct
     ? requestKind === 'availability'
-      ? `Please confirm availability and expected delivery for ${product}${sku ? ` (${sku})` : ''}.`
-      : `Please provide pricing and availability for ${product}${sku ? ` (${sku})` : ''}.`
+      ? T(`Please confirm availability and expected delivery for ${product}${sku ? ` (${sku})` : ''}.`,`يرجى تأكيد توفر ${product}${sku ? ` (${sku})` : ''} وموعد التوصيل المتوقع.`)
+      : T(`Please provide pricing and availability for ${product}${sku ? ` (${sku})` : ''}.`,`يرجى تزويدي بالسعر ومدى توفر ${product}${sku ? ` (${sku})` : ''}.`)
     : undefined;
 
   return <form onSubmit={submit} className="grid gap-4 rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-7 md:grid-cols-2">
-    <div className="md:col-span-2 rounded-2xl bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-800"><Info className="mr-2 inline" size={15}/><b>{T('Management demo:','نسخة تجريبية للإدارة:')}</b> {T('submissions generate a reference number now; live email routing will be enabled after domain approval.','يتم الآن إنشاء رقم مرجعي للطلبات، وسيتم تفعيل إرسال البريد الإلكتروني بعد اعتماد النطاق.')}</div>
-    {hasProduct && <div className="md:col-span-2 rounded-2xl border border-blue-100 bg-white px-4 py-4"><div className="text-[10px] font-black uppercase tracking-[.16em] text-[#0b5cff]">Selected Product</div><div className="mt-1 font-black text-slate-900">{product}</div>{sku && <div className="mt-1 text-xs font-bold text-slate-500">SKU / Model: {sku}</div>}<input type="hidden" name="equipment" value={equipment}/></div>}
+    <div className="md:col-span-2 rounded-2xl bg-blue-50 px-4 py-3 text-xs leading-5 text-blue-800"><Info className={ar?'ml-2 inline':'mr-2 inline'} size={15}/><b>{T('Management demo:','نسخة تجريبية للإدارة:')}</b> {T('submissions generate a reference number now; live email routing will be enabled after domain approval.','يتم الآن إنشاء رقم مرجعي للطلبات، وسيتم تفعيل إرسال البريد الإلكتروني بعد اعتماد النطاق.')}</div>
+    {hasProduct && <div className="md:col-span-2 rounded-2xl border border-blue-100 bg-white px-4 py-4"><div className="text-[10px] font-black uppercase tracking-[.16em] text-[#0b5cff]">{T('Selected Product','المنتج المحدد')}</div><div className="mt-1 font-black text-slate-900">{product}</div>{sku && <div className="mt-1 text-xs font-bold text-slate-500">{T('SKU / Model','رمز المنتج / الموديل')}: {sku}</div>}<input type="hidden" name="equipment" value={equipment}/></div>}
     <input name="name" required autoComplete="name" className="form-field" placeholder={isService ? T('Name / Company','الاسم / الشركة') : T('Name','الاسم')} />
     {!isService && <input name="company" autoComplete="organization" className="form-field" placeholder={T('Company','الشركة')} />}
     <input name="phone" required autoComplete="tel" className="form-field" placeholder={T('Phone','الهاتف')} />
@@ -80,11 +80,11 @@ export function RequestForm({ mode, product = '', sku = '', requestKind = 'busin
     </>}
     <textarea name="message" required className="form-field min-h-36 md:col-span-2" defaultValue={defaultMessage} placeholder={isService ? T('Describe the issue','صف المشكلة') : T('Tell us about products, locations, equipment, support scope or project requirements','أخبرنا عن المنتجات أو المواقع أو الأجهزة أو نطاق الدعم أو متطلبات المشروع')} />
     <button type="submit" disabled={status==='sending'} className={`rounded-full px-6 py-3.5 font-black text-white md:col-span-2 ${isService?'bg-[#0b5cff]':'bg-[#f47b20]'} disabled:cursor-not-allowed disabled:opacity-60`}>
-      {status==='sending' ? <><Loader2 className="mr-2 inline animate-spin" size={17}/>{T('Submitting...','جارٍ الإرسال...')}</> : isService ? T('Submit Service Request','إرسال طلب الصيانة') : requestKind === 'availability' ? T('Submit Availability Request','إرسال طلب التوفر') : requestKind === 'price' ? T('Submit Price Request','إرسال طلب السعر') : T('Submit Quote Request','إرسال طلب عرض السعر')}
+      {status==='sending' ? <><Loader2 className={ar?'ml-2 inline animate-spin':'mr-2 inline animate-spin'} size={17}/>{T('Submitting...','جارٍ الإرسال...')}</> : isService ? T('Submit Service Request','إرسال طلب الصيانة') : requestKind === 'availability' ? T('Submit Availability Request','إرسال طلب التوفر') : requestKind === 'price' ? T('Submit Price Request','إرسال طلب السعر') : T('Submit Quote Request','إرسال طلب عرض السعر')}
     </button>
     {(status==='success'||status==='error') && <div aria-live="polite" className={`md:col-span-2 rounded-2xl p-4 text-sm ${status==='success'?'bg-emerald-50 text-emerald-800':'bg-red-50 text-red-700'}`}>
-      {status==='success' && <CheckCircle2 className="mr-2 inline" size={17}/>} {message}
-      {reference && <div className="mt-2 font-black">Reference: {reference}</div>}
+      {status==='success' && <CheckCircle2 className={ar?'ml-2 inline':'mr-2 inline'} size={17}/>} {message}
+      {reference && <div className="mt-2 font-black">{T('Reference','الرقم المرجعي')}: {reference}</div>}
     </div>}
   </form>;
 }
